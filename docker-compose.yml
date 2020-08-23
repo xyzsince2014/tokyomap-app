@@ -1,0 +1,36 @@
+version: "3"
+services:
+    app:
+        build:
+            context: ./docker/app # the dir Dockerfile is put
+        image: tokyomap.auth_app # image name
+        container_name: tokyomap.auth_app
+        ports:
+            - "4000:4000"
+        volumes:
+            - "./app:/src"
+        command:  [sh, -c, yarn install && yarn start]
+    web:
+        build:
+            context: ./docker/web
+        image: tokyomap.auth_web
+        container_name: tokyomap.auth_web
+        ports:
+            - "80:80"
+    db:
+        # todo: use Dockerfile and CentOS instead of mariadb/server
+        image: mariadb/server
+        container_name: tokyomap.auth_db
+        environment:
+            MYSQL_ROOT_PASSWbORD: root
+            MYSQL_DATABASE: tokyomap_auth
+            MYSQL_USER: docker
+            MYSQL_PASSWORD: docker
+            TZ: 'Asia/Tokyo'
+        command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+        volumes:
+            - ./docker/db/var:/var/lib/mysql
+            - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf # config
+            - ./docker/db/sql:/docker-entrypoint-initdb.d
+        ports:
+            - "3306:3306"
