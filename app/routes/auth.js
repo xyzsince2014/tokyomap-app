@@ -2,18 +2,20 @@ const dotenv = require('dotenv');
 const router = require("express").Router();
 const authController = require("../controllers/auth");
 
+const CLIENT = "http://localhost:3000";
+
 dotenv.config();
 const sessionConfig = {
-  successRedirect: process.env.DOMAIN_CLIENT,
-  failureRedirect: "/auth/login/failed",
+  successRedirect: CLIENT,
+  failureRedirect: process.env.DOMAIN_CLIENT,
   session: true,
 };
 
 module.exports = passport => {
   router
-    .get("/login/success", authController.index)
-    .get("/login/failed", authController.notifyLoginFailure)
-    .get("/logout", authController.logout)
+    .get("/verify", authController.verify)
+    // .get("/login/failed", authController.notifyLoginFailure)
+    .get("/signout", authController.signout)
     .get("/twitter", passport.authenticate("twitter"))
     .get("/twitter/callback", passport.authenticate("twitter", sessionConfig));
 
