@@ -23,6 +23,7 @@ app
       resave: false,
       saveUninitialized: false,
       cookie: {
+        // domain: "http://127.0.0.1:3000",
         httpOnly: false,
         secure: false,
         // httpOnly: true,

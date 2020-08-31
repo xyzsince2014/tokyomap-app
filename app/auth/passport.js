@@ -13,7 +13,8 @@ module.exports = () => {
       {
         consumerKey: process.env.TWITTER_CONSUMER_KEY,
         consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-        callbackURL: '/auth/twitter/callback',
+        // callbackURL: '/auth/twitter/callback',
+        callbackURL: "http://localhost:3000",
         includeEmail: true,
       },
       async (token, tokenSecret, profile, done) => {
