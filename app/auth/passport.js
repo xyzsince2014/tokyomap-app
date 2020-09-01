@@ -13,8 +13,8 @@ module.exports = () => {
       {
         consumerKey: process.env.TWITTER_CONSUMER_KEY,
         consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-        // callbackURL: '/auth/twitter/callback',
-        callbackURL: "http://localhost:3000",
+        callbackURL: '/auth/twitter/callback',
+        // callbackURL: "http://localhost:3000",
         includeEmail: true,
       },
       async (token, tokenSecret, profile, done) => {
@@ -44,7 +44,6 @@ module.exports = () => {
             profileImageUrl: profile._json.profile_image_url
           };
 
-          console.log(user);
           // try {
           //   await mysqlPromise.query(con, "INSERT INTO subscribers SET ?", user);
           //   mysqlPromise.commit(con);

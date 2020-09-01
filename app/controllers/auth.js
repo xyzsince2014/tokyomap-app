@@ -2,28 +2,17 @@ const httpStatus = require("http-status-codes")
 
 const verify = (req, res) => {
   if (req.user) {
-    res.json({
-      status: httpStatus.OK,
-      success: true,
-      message: "user has successfully authenticated",
+    res.status(httpStatus.OK).json({
+      authenticated: true,
       user: req.user,
       cookies: req.cookies
     });
   }
 
-  res.json({
-    status: httpStatus.FORBIDDEN,
-    success: false,
-    message: "user failed to authenticate."
+  res.status(httpStatus.FORBIDDEN).json({
+    authenticated: false,
   });
 };
-
-// const notifyLoginFailure = (req, res) => {
-  // res.status(401).json({
-  //   success: false,
-  //   message: "user failed to authenticate."
-  // });
-// };
 
 const signout = (req, res) => {
   req.logout();
@@ -32,6 +21,5 @@ const signout = (req, res) => {
 
 module.exports = {
   verify,
-  // notifyLoginFailure,
   signout
 };
