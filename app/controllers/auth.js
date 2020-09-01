@@ -1,5 +1,7 @@
 const httpStatus = require("http-status-codes")
 
+const CLIENT = "http://localhost:3000";
+
 const verify = (req, res) => {
   if (req.user) {
     res.status(httpStatus.OK).json({
@@ -16,7 +18,7 @@ const verify = (req, res) => {
 
 const signout = (req, res) => {
   req.logout();
-  res.redirect(process.env.DOMAIN_DEV);
+  res.redirect(CLIENT);
 };
 
 module.exports = {
