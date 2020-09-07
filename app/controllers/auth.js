@@ -1,28 +1,27 @@
-const index = (req, res) => {
+const httpStatus = require("http-status-codes")
+
+const CLIENT = "http://localhost:3000"; // todo: use process.env.DOMAIN_CLIENT
+
+const verify = (req, res) => {
   if (req.user) {
-    res.json({
-      success: true,
-      message: "user has successfully authenticated",
+    res.status(httpStatus.OK).json({
+      authenticated: true,
       user: req.user,
       cookies: req.cookies
     });
   }
-};
 
-const notifyLoginFailure = (req, res) => {
-  res.status(401).json({
-    success: false,
-    message: "user failed to authenticate."
+  res.status(httpStatus.FORBIDDEN).json({
+    authenticated: false,
   });
 };
 
-const logout = (req, res) => {
+const signout = (req, res) => {
   req.logout();
-  res.redirect(process.env.DOMAIN_DEV);
+  res.redirect(CLIENT);
 };
 
 module.exports = {
-  index,
-  notifyLoginFailure,
-  logout
+  verify,
+  signout
 };

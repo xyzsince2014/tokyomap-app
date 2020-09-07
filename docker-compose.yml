@@ -22,7 +22,7 @@ services:
         image: mariadb/server
         container_name: tokyomap.auth_db
         environment:
-            MYSQL_ROOT_PASSWbORD: root
+            MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: tokyomap_auth
             MYSQL_USER: docker
             MYSQL_PASSWORD: docker

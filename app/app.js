@@ -12,13 +12,12 @@ const app = express();
 
 // middlewares
 app
-  .use(methodOverride("_method", { methods: ["POST", "GET"] })) // option methods must be an array of upper-case strings
-  .use(cookieParser()) // enables to fetch cookie in request headers by req.cookies
-  .use(express.urlencoded({ extended: true })) // enables to fetch incoming data by req.body.hoge for POST & PUT methods
+  .use(methodOverride("_method", { methods: ["POST", "GET"] }))
+  .use(cookieParser())
+  .use(express.urlencoded({ extended: true }))
   .use(express.json())
   .use(
     session({
-      // cf. https://qiita.com/hika7719/items/3282ab2ebcdaf080912e
       secret: 'keyboard cat',
       resave: false,
       saveUninitialized: false,
@@ -27,17 +26,17 @@ app
         secure: false,
         // httpOnly: true,
         // secure: true,
-        maxAge: 1000 * 60 * 15, // 15 min
+        maxAge: 1000 * 60 * 15,
       },
     })
   )
-  .use(passport.initialize()) // use session() before passport.session() to ensure that the login session is restored in the correct order
-  .use(passport.session()) // executes .use(passport.authenticate('hoge')) to enable persistent auth sessions, cf. https://applingo.tokyo/article/1700
+  .use(passport.initialize())
+  .use(passport.session())
   .use(
     cors({
-      origin: "http://localhost:3000", // allow to server to accept request from different origin
+      origin: "http://localhost:3000", // todo: use process.env.DOMAIN_CLIENT
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-      credentials: true // allow session cookie from browser to pass through
+      credentials: true
     })
   )
   .use("/", router(passport)); // routings
