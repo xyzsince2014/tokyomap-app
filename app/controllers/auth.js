@@ -1,6 +1,6 @@
 const httpStatus = require("http-status-codes")
 
-const CLIENT = "http://localhost:3000";
+const CLIENT = "http://localhost:3000"; // todo: use process.env.DOMAIN_CLIENT
 
 const verify = (req, res) => {
   if (req.user) {

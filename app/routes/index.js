@@ -1,12 +1,12 @@
 const router = require("express").Router();
 
 const authRouter = require("./auth");
-// const errorRouter = require("./error");
+const errorRouter = require("./error");
 
 module.exports = passport => {
   router
     .use("/auth", authRouter(passport))
-    // .use("/", errorRouter);
+    .use("/", errorRouter);
 
   return router;
 };

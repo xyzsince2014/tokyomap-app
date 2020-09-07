@@ -1,10 +1,5 @@
 const httpStatus = require("http-status-codes");
 
-const logErrors = (err, req, res, next) => {
-  console.log(err.stack); // logs the error stack
-  next(err);
-};
-
 const respondNotFound = (req, res) => {
   res.status(httpStatus.NOT_FOUND).json({
     authenticated: false,
@@ -20,7 +15,6 @@ const respondInternalServerError = (req, res) => {
 };
 
 module.exports = {
-  logErrors,
   respondNotFound,
   respondInternalServerError
 };

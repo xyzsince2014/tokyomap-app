@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const router = require("express").Router();
 const authController = require("../controllers/auth");
 
-const CLIENT = "http://localhost:3000";
+const CLIENT = "http://localhost:3000"; // todo: use process.env.DOMAIN_CLIENT
 
 dotenv.config();
 const sessionConfig = {
