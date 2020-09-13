@@ -8,7 +8,7 @@ const debug = require('debug')('app:server');
 const http = require('http');
 const socketio = require('socket.io');
 
-const socketioController = require("../controllers/socketio");
+const socketioController = require("../controllers/socket.io");
 
 /**
  * Get port from environment and store in Express.

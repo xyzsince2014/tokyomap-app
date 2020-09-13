@@ -9,6 +9,7 @@ const verify = (req, res) => {
       user: req.user,
       cookies: req.cookies
     });
+    return;
   }
 
   res.status(httpStatus.FORBIDDEN).json({
