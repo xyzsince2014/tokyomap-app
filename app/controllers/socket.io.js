@@ -27,8 +27,8 @@ const socketHandler = io => {
         await maria.beginTransaction(con);
         await maria.query(
           con,
-          'INSERT INTO posts SET post_text = ?, post_name = ?, posted_at = NOW()',
-          [data.postText, data.postName]
+          'INSERT INTO posts SET post_text = ?, post_name = ?, lat = ?, lng = ?, posted_at = NOW()',
+          [data.postText, data.postName, data.lat, data.lng]
         );
         maria.commit(con);
         con.end();
@@ -39,7 +39,7 @@ const socketHandler = io => {
       }
       fetchPosts(io);
     });
-
+    // INSERT INTO posts SET post_text = "test", post_name = "test", lat = 35.7263716, lng = 139.7029377, posted_at = NOW();
     socket.on("disconnect", () => {
       socket.broadcast.emit('disconncted');
       console.log("----- A client disconnected -----");
