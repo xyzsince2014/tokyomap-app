@@ -6,6 +6,9 @@
 const app = require('../app');
 const debug = require('debug')('app:server');
 const http = require('http');
+const socketio = require('socket.io');
+
+const socketioController = require("../controllers/socketio");
 
 /**
  * Get port from environment and store in Express.
@@ -17,6 +20,11 @@ app.set('port', port);
  * Create HTTP server.
  */
 const server = http.createServer(app);
+
+/**
+ * socket.io
+ */
+socketioController.socketHandler(socketio(server));
 
 /**
  * Listen on provided port, on all network interfaces.

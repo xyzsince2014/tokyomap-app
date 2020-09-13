@@ -1,20 +1,12 @@
-USE tokyomap_auth;
+USE tokyomap_api;
 
 /* create tables */
 START TRANSACTION;
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
-    userId INT(5) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(128) NOT NULL,
-    screenName VARCHAR(128) NOT NULL,
-    twitterId VARCHAR(256) NOT NULL UNIQUE,
-    profileImageUrl VARCHAR(256)
+DROP TABLE IF EXISTS posts;
+CREATE TABLE posts (
+    post_no INT(5) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    post_text VARCHAR(256) NOT NULL,
+    post_name INT(5) UNSIGNED NOT NULL,
+    posted_at DATETIME NOT NULL
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_bin ENGINE=InnoDB;
 COMMIT;
-
-/* initailise tables */
--- BEGIN;
--- LOAD DATA INFILE "/docker-entrypoint-initdb.d/initial_data_users.csv"
--- INTO TABLE users FIELDS TERMINATED BY ","
--- (user_given_name, user_family_name, user_email, user_postal_code, password);
--- COMMIT;
