@@ -10,14 +10,13 @@ const dbConfig = {
   database: 'tokyomap_api',
 };
 
-// todo:
-// 1. store & fetch messages & locations into/from DB
-// 2. fetch them from twitter streaming api
 const socketHandler = io => {
   io.on("connection", async socket => {
-    console.log("----- A client connected -----");
+    console.log(`----- A client connected -----`);
 
-    fetchPosts(io);
+    socket.on('init', () => {
+      fetchAllPosts(io);
+    });
 
     socket.on("posted", async data => {
       console.log(`data = ${JSON.stringify(data)}`);
@@ -27,8 +26,8 @@ const socketHandler = io => {
         await maria.beginTransaction(con);
         await maria.query(
           con,
-          'INSERT INTO posts SET post_text = ?, post_name = ?, lat = ?, lng = ?, posted_at = NOW()',
-          [data.postText, data.postName, data.lat, data.lng]
+          'INSERT INTO posts SET message = ?, user = ?, lat = ?, lng = ?, posted_at = NOW()',
+          [data.message, data.user, data.lat, data.lng]
         );
         maria.commit(con);
         con.end();
@@ -37,9 +36,9 @@ const socketHandler = io => {
         con.end();
         console.log(`Error inserting into posts : ${err}`);
       }
-      fetchPosts(io);
+      fetchPost(io);
     });
-    // INSERT INTO posts SET post_text = "test", post_name = "test", lat = 35.7263716, lng = 139.7029377, posted_at = NOW();
+
     socket.on("disconnect", () => {
       socket.broadcast.emit('disconncted');
       console.log("----- A client disconnected -----");
@@ -47,17 +46,56 @@ const socketHandler = io => {
   });
 };
 
-const fetchPosts = async (io) => {
+const fetchAllPosts = async (io) => {
   const con = mysql.createConnection(dbConfig);
     try {
-      const posts = await maria.query(
+      const records = await maria.query(
         con,
         "SELECT * FROM posts ORDER BY posted_at DESC LIMIT 15"
       );
       con.end();
-      io.emit('fetched', posts);
+
+      if(!records) {
+        io.emit('fetchedAllPosts', []);
+        return;
+      }
+
+      let posts = [];
+      records.map(rec => {
+        posts.push({
+          no: rec.no,
+          message: rec.message,
+          user: rec.user,
+          postedAt: rec.posted_at,
+          lat: rec.lat,
+          lng: rec.lng,
+        });
+      });
+
+      io.emit('fetchedAllPosts', posts);
     } catch (err) {
-      console.log(`Error in fetcing posts : ${err}`);
+      console.log(`Error in fetcing all posts : ${err}`);
+    }
+};
+
+const fetchPost = async (io) => {
+  const con = mysql.createConnection(dbConfig);
+    try {
+      const post = (await maria.query(
+        con,
+        "SELECT * FROM posts ORDER BY posted_at DESC LIMIT 1"
+      ))[0];
+      con.end();
+      io.emit('fetchedPost', {
+        no: rec.no,
+        message: rec.message,
+        user: rec.user,
+        postedAt: rec.posted_at,
+        lat: rec.lat,
+        lng: rec.lng,
+      });
+    } catch (err) {
+      console.log(`Error in fetcing the latest post : ${err}`);
     }
 };
 
