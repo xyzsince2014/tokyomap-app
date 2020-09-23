@@ -7,7 +7,7 @@ const cors = require("cors");
 const router = require('./routes/index');
 
 // configs
-const passport = require('./auth/passport')();
+const passport = require('./middlewares/passport')();
 const app = express();
 
 // middlewares
