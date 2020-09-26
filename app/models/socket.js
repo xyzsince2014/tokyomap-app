@@ -41,23 +41,23 @@ const getTweets = async () => {
   }
 };
 
-// const getTweets = () => {
-//     const con = mysql.createConnection(dbConfig);
-//     try {
-//       await maria.beginTransaction(con);
-//       await maria.query(
-//         con,
-//         'INSERT INTO posts SET message = ?, user = ?, lat = ?, lng = ?, posted_at = NOW()',
-//         [data.message, data.user, data.lat, data.lng]
-//       );
-//       maria.commit(con);
-//       con.end();
-//     } catch (err) {
-//       await maria.rollback(con);
-//       con.end();
-//       console.log(`Error inserting into posts : ${err}`);
-//     }
-// };
+const updateTweets = () => {
+    const con = mysql.createConnection(dbConfig);
+    try {
+      await maria.beginTransaction(con);
+      await maria.query(
+        con,
+        'INSERT INTO tweets SET user_id ?, user_name = ?, message = ?, posted_at = NOW(), lat = ?, lng = ?',
+        [data.userId, data.userName, data.message, data.lat, data.lng]
+      );
+      maria.commit(con);
+      con.end();
+    } catch (err) {
+      await maria.rollback(con);
+      con.end();
+      console.log(`Error inserting into posts : ${err}`);
+    }
+};
 
 // const fetchPost = async (io) => {
 //   const con = mysql.createConnection(dbConfig);
@@ -81,4 +81,5 @@ const getTweets = async () => {
 
 module.exports = {
   getTweets,
+  updateTweets
 };
