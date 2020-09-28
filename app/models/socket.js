@@ -47,7 +47,7 @@ const updateTweets = async ({ tweet, userId }) => {
       await maria.beginTransaction(con);
       await maria.query(
         con,
-        `INSERT INTO tweets SET user_id = ${tweet.userId}, user_name = "${tweet.userName}", message = "${tweet.message}", posted_at = NOW(), lat = ${tweet.lat}, lng = ${tweet.lng}`,
+        `INSERT INTO tweets SET user_id = ${userId}, user_name = "${tweet.userName}", message = "${tweet.message}", posted_at = NOW(), lat = ${tweet.lat}, lng = ${tweet.lng}`,
       );
       maria.commit(con);
       con.end();

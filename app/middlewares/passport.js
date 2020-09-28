@@ -32,7 +32,7 @@ module.exports = () => {
 
   passport.deserializeUser(async (twitterId, done) => {
     const user = {
-      twitterId: twitterId,
+      userId: twitterId,
     };
     done(null, user);
   });

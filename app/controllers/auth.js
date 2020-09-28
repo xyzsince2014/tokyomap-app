@@ -5,7 +5,7 @@ const CLIENT = "http://localhost:3000"; // todo: use process.env.DOMAIN_CLIENT
 const verify = (req, res) => {
   if (req.user) {
     res.status(httpStatus.OK).json({
-      authenticated: true,
+      isAuthenticated: true,
       user: req.user,
       cookies: req.cookies
     });
@@ -13,7 +13,7 @@ const verify = (req, res) => {
   }
 
   res.status(httpStatus.FORBIDDEN).json({
-    authenticated: false,
+    isAuthenticated: false,
   });
 };
 
