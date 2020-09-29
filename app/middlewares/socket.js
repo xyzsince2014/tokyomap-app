@@ -12,7 +12,8 @@ const socketHandler = io => {
     socket.on('broadcastTweet', async ({ tweet, userId }) => {
       await mariaSocket.updateTweets({ tweet, userId });
       const tweets = await mariaSocket.getTweets();
-      socket.emit(`broadcastTweet:done`, tweets);
+      socket.emit('broadcastTweet:done', tweets);
+      socket.broadcast.emit('broadcastTweet:done', tweets);
     });
   });
 };
