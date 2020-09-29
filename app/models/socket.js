@@ -27,6 +27,7 @@ const getTweets = async () => {
 
     records.map(rec => {
       tweets.push({
+        tweetId: rec.tweet_id,
         userId: rec.user_id,
         userName: rec.user_name,
         message: rec.message,
@@ -57,26 +58,6 @@ const updateTweets = async ({ tweet, userId }) => {
       console.log(`Error inserting into posts : ${err}`);
     }
 };
-
-// const fetchPost = async (io) => {
-//   const con = mysql.createConnection(dbConfig);
-//     try {
-//       const post = (await maria.query(
-//         con,
-//         "SELECT * FROM posts ORDER BY posted_at DESC LIMIT 1"
-//       ))[0];
-//       con.end();
-//       io.emit('fetchedPost', {
-//         no: rec.no,
-//         message: rec.message,
-//         user: rec.user,
-//         postedAt: rec.posted_at,
-//         lat: rec.lat,
-//         lng: rec.lng,
-//       });
-//     } catch (err) {
-//       console.log(`Error in fetcing the latest post : ${err}`);
-//     }
 
 module.exports = {
   getTweets,
