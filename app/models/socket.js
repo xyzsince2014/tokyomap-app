@@ -32,6 +32,7 @@ const getTweets = async () => {
         userName: rec.user_name,
         message: rec.message,
         postedAt: rec.posted_at,
+        disappearAt: rec.disappear_at,
         lat: rec.lat,
         lng: rec.lng,
       });
@@ -48,7 +49,7 @@ const updateTweets = async ({ tweet, userId }) => {
       await maria.beginTransaction(con);
       await maria.query(
         con,
-        `INSERT INTO tweets SET user_id = ${userId}, user_name = "${tweet.userName}", message = "${tweet.message}", posted_at = NOW(), lat = ${tweet.lat}, lng = ${tweet.lng}`,
+        `INSERT INTO tweets SET user_id = ${userId}, user_name = "${tweet.userName}", message = "${tweet.message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${tweet.lat}, lng = ${tweet.lng}`,
       );
       maria.commit(con);
       con.end();
