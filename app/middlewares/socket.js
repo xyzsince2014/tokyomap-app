@@ -4,16 +4,16 @@ const socketHandler = io => {
   io.origins('*:*');
 
   io.on('connection', socket => {
-    socket.on('initState', async () => {
+    socket.on('initSocketState', async () => {
       const tweets = await mariaSocket.getTweets();
-      socket.emit('initState:done', tweets);
+      socket.emit('initSocketState:done', tweets);
     });
 
-    socket.on('broadcastTweet', async ({ tweet, userId }) => {
+    socket.on('postTweet', async ({ tweet, userId }) => {
       await mariaSocket.updateTweets({ tweet, userId });
       const tweets = await mariaSocket.getTweets();
-      socket.emit('broadcastTweet:done', tweets);
-      socket.broadcast.emit('broadcastTweet:done', tweets);
+      socket.emit('postTweet:done', tweets);
+      socket.broadcast.emit('postTweet:done', tweets);
     });
   });
 };
