@@ -17,7 +17,7 @@ const getTweets = async () => {
   try {
     const records = await maria.query(
       con,
-      "SELECT * FROM tweets WHERE posted_at > (NOW() + INTERVAL - 90 MINUTE) ORDER BY posted_at DESC LIMIT 100"
+      "SELECT * FROM tweets WHERE posted_at > (NOW() + INTERVAL - 90 MINUTE) ORDER BY posted_at ASC LIMIT 100"
     );
     con.end();
 
