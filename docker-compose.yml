@@ -3,8 +3,8 @@ services:
     app:
         build:
             context: ./docker/app # the dir Dockerfile is put
-        image: tokyomap.auth_app # image name
-        container_name: tokyomap.auth_app
+        image: tokyomap.api_app # image name
+        container_name: tokyomap.api_app
         ports:
             - "4000:4000"
         volumes:
@@ -13,17 +13,17 @@ services:
     web:
         build:
             context: ./docker/web
-        image: tokyomap.auth_web
-        container_name: tokyomap.auth_web
+        image: tokyomap.api_web
+        container_name: tokyomap.api_web
         ports:
             - "80:80"
     db:
         # todo: use Dockerfile and CentOS instead of mariadb/server
         image: mariadb/server
-        container_name: tokyomap.auth_db
+        container_name: tokyomap.api_db
         environment:
             MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: tokyomap_auth
+            MYSQL_DATABASE: tokyomap_api
             MYSQL_USER: docker
             MYSQL_PASSWORD: docker
             TZ: 'Asia/Tokyo'
