@@ -11,7 +11,7 @@ const dbConfig = {
   database: "tokyomap_api",
 };
 
-const postTwitterUser = async user => {
+const postUser = async user => {
     console.log(user);
     const con = mysql.createConnection(dbConfig);
     try {
@@ -26,5 +26,5 @@ const postTwitterUser = async user => {
 };
 
 module.exports = {
-  postTwitterUser,
+  postUser,
 };

@@ -16,7 +16,9 @@ module.exports = passport => {
     .get("/verify", authController.verify)
     .get("/signout", authController.signout)
     .get("/twitter", passport.authenticate("twitter"))
-    .get("/twitter/callback", passport.authenticate("twitter", sessionConfig));
+    .get("/twitter/callback", passport.authenticate("twitter", sessionConfig))
+    .get("/facebook", passport.authenticate("facebook", sessionConfig))
+    .get("/facebook/callback", passport.authenticate("facebook", sessionConfig));
 
   return router;
 };

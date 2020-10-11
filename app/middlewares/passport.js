@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const passport = require("passport");
 const TwitterStrategy = require("passport-twitter").Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 
 const mariaAuth = require('../models/auth');
 
@@ -22,8 +23,31 @@ module.exports = () => {
           userName: profile._json.screen_name,
           profileImageUrl: profile._json.profile_image_url,
         };
-        mariaAuth.postTwitterUser(user);
+        mariaAuth.postUser(user);
         done(null, user);
+      }
+    )
+  );
+
+  passport.use(
+    "facebook",
+    new FacebookStrategy(
+      {
+        clientID: process.env.FACEBOOK_APP_ID,
+        clientSecret: process.env.FACEBOOK_APP_SECRET,
+        callbackURL: "/auth/facebook/callback"
+      },
+      (accessToken, refreshToken, profile, done) => {
+        const user = {
+          name: profile._json.name,
+          userId: profile.id,
+          userName: profile.displayName,
+          profileImageUrl: '',
+        };
+        mariaAuth.postUser(user);
+        process.nextTick(() => {
+          return done(null, user);
+        });
       }
     )
   );
