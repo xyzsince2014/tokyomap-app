@@ -17,7 +17,7 @@ const getTweets = async () => {
   try {
     const records = await maria.query(
       con,
-      "SELECT * FROM tweets WHERE posted_at > (NOW() + INTERVAL - 90 MINUTE) ORDER BY posted_at ASC LIMIT 100"
+      "SELECT * FROM tweets as t JOIN users AS u ON t.user_id = u.user_id WHERE posted_at > (NOW() + INTERVAL - 90 MINUTE) ORDER BY posted_at LIMIT 100"
     );
     con.end();
 
@@ -30,6 +30,7 @@ const getTweets = async () => {
         tweetId: rec.tweet_id,
         userId: rec.user_id,
         userName: rec.user_name,
+        profileImageUrl: rec.profile_image_url ? rec.profile_image_url : '',
         message: rec.message,
         postedAt: rec.posted_at,
         disappearAt: rec.disappear_at,
@@ -43,13 +44,13 @@ const getTweets = async () => {
   }
 };
 
-const updateTweets = async ({ tweet, userId }) => {
+const postTweet = async ({ tweet, userId }) => {
     const con = mysql.createConnection(dbConfig);
     try {
       await maria.beginTransaction(con);
       await maria.query(
         con,
-        `INSERT INTO tweets SET user_id = ${userId}, user_name = "${tweet.userName}", message = "${tweet.message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${tweet.lat}, lng = ${tweet.lng}`,
+        `INSERT INTO tweets SET user_id = ${userId}, message = "${tweet.message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${tweet.lat}, lng = ${tweet.lng}`,
       );
       maria.commit(con);
       con.end();
@@ -62,5 +63,5 @@ const updateTweets = async ({ tweet, userId }) => {
 
 module.exports = {
   getTweets,
-  updateTweets
+  postTweet
 };

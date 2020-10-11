@@ -3,6 +3,8 @@ require("dotenv").config();
 const passport = require("passport");
 const TwitterStrategy = require("passport-twitter").Strategy;
 
+const mariaAuth = require('../models/auth');
+
 module.exports = () => {
   passport.use(
     "twitter",
@@ -16,23 +18,23 @@ module.exports = () => {
       (token, tokenSecret, profile, done) => {
         const user = {
           name: profile._json.name,
-          screenName: profile._json.screen_name,
-          twitterId: profile._json.id_str,
+          userId: profile._json.id_str,
+          userName: profile._json.screen_name,
           profileImageUrl: profile._json.profile_image_url,
         };
-
+        mariaAuth.postTwitterUser(user);
         done(null, user);
       }
     )
   );
 
   passport.serializeUser((user, done) => {
-    done(null, user.twitterId);
+    done(null, user.userId);
   });
 
-  passport.deserializeUser(async (twitterId, done) => {
+  passport.deserializeUser(async (userId, done) => {
     const user = {
-      userId: twitterId,
+      userId: userId,
     };
     done(null, user);
   });
