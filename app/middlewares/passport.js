@@ -3,6 +3,7 @@ require("dotenv").config();
 const passport = require("passport");
 const TwitterStrategy = require("passport-twitter").Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
+const LineStrategy = require('passport-line-auth').Strategy;
 
 const mariaAuth = require('../models/auth');
 
@@ -18,7 +19,6 @@ module.exports = () => {
       },
       (token, tokenSecret, profile, done) => {
         const user = {
-          name: profile._json.name,
           userId: profile._json.id_str,
           userName: profile._json.screen_name,
           profileImageUrl: profile._json.profile_image_url,
@@ -39,7 +39,6 @@ module.exports = () => {
       },
       (accessToken, refreshToken, profile, done) => {
         const user = {
-          name: profile._json.name,
           userId: profile.id,
           userName: profile.displayName,
           profileImageUrl: '',
@@ -48,6 +47,29 @@ module.exports = () => {
         process.nextTick(() => {
           return done(null, user);
         });
+      }
+    )
+  );
+
+  passport.use(
+    "line",
+    new LineStrategy(
+      {
+        channelID: process.env.LINE_CHANNEL_ID,
+        channelSecret: process.env.LINE_CHANNEL_SECRET,
+        callbackURL: "/auth/line/callback",
+        scope: ['profile', 'openid'],
+        botPrompt: 'normal',
+        uiLocales: 'en-US',
+      },
+      (accessToken, refreshToken, profile, done) => {
+        const user = {
+          userId: profile.id,
+          userName: profile.displayName,
+          profileImageUrl: profile.pictureUrl,
+        };
+        mariaAuth.postUser(user);
+        done(null, user);
       }
     )
   );

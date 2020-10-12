@@ -50,7 +50,7 @@ const postTweet = async ({ tweet, userId }) => {
       await maria.beginTransaction(con);
       await maria.query(
         con,
-        `INSERT INTO tweets SET user_id = ${userId}, message = "${tweet.message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${tweet.lat}, lng = ${tweet.lng}`,
+        `INSERT INTO tweets SET user_id = "${userId}", message = "${tweet.message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${tweet.lat}, lng = ${tweet.lng}`,
       );
       maria.commit(con);
       con.end();
