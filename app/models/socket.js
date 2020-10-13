@@ -1,13 +1,12 @@
 const mysql = require("mysql");
-const maria = require("../utils/maria");
-const cors = require("cors");
 
-// todo: use ../config/maria.dbConfig
+const maria = require("../utils/maria");
+
 const dbConfig = {
-  host: "db",
-  user: "docker",
-  password: "docker",
-  database: "tokyomap_api",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
 };
 
 const getTweets = async () => {
@@ -50,7 +49,7 @@ const postTweet = async ({ tweet, userId }) => {
       await maria.beginTransaction(con);
       await maria.query(
         con,
-        `INSERT INTO tweets SET user_id = ${userId}, message = "${tweet.message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${tweet.lat}, lng = ${tweet.lng}`,
+        `INSERT INTO tweets SET user_id = "${userId}", message = "${tweet.message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${tweet.lat}, lng = ${tweet.lng}`,
       );
       maria.commit(con);
       con.end();

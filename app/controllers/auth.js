@@ -1,9 +1,7 @@
 const httpStatus = require("http-status-codes")
 
-const CLIENT = "http://localhost:3000"; // todo: use process.env.DOMAIN_CLIENT
-
-const verify = (req, res) => {
-  if (req.user) {
+const authenticate = (req, res) => {
+  if(req.isAuthenticated()) {
     res.status(httpStatus.OK).json({
       isAuthenticated: true,
       user: req.user,
@@ -19,10 +17,10 @@ const verify = (req, res) => {
 
 const signout = (req, res) => {
   req.logout();
-  res.redirect(CLIENT);
+  res.redirect(process.env.DOMAIN_CLIENT);
 };
 
 module.exports = {
-  verify,
+  authenticate,
   signout
 };
