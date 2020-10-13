@@ -15,12 +15,6 @@ module.exports = passport => {
   router
     .get("/authenticate", authController.authenticate)
     .get("/signout", authController.signout)
-    // .get("/:provider", (req, res, next) => {
-    //   passport.authenticate(req.params.provider);
-    // })
-    // .get("/:provider/callback", (req, res, next) => {
-    //   passport.authenticate(req.params.provider, sessionConfig);
-    // })
     .get("/twitter", passport.authenticate("twitter"))
     .get("/twitter/callback", passport.authenticate("twitter", sessionConfig))
     .get("/facebook", passport.authenticate("facebook"))

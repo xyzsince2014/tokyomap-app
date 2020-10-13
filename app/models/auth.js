@@ -12,7 +12,6 @@ const dbConfig = {
 };
 
 const postUser = async user => {
-    console.log(user);
     const con = mysql.createConnection(dbConfig);
     try {
       await maria.beginTransaction(con);
