@@ -17,7 +17,7 @@ app
   .use(express.urlencoded({ extended: true }))
   .use(express.json())
   .use(
-    session({
+    session({ // cf. https://www.npmjs.com/package/express-session
       secret: 'keyboard cat',
       resave: false,
       saveUninitialized: false,
@@ -31,7 +31,7 @@ app
     })
   )
   .use(passport.initialize())
-  .use(passport.session())
+  .use(passport.session()) // enables passport.js to store auth info in the session
   .use(
     cors({
       origin: "http://localhost:3000", // todo: use process.env.DOMAIN_CLIENT

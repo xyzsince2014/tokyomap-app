@@ -23,7 +23,8 @@ module.exports = () => {
           userName: profile._json.screen_name,
           profileImageUrl: profile._json.profile_image_url,
         };
-        mariaAuth.postUser(user);
+        // await ?
+        mariaAuth.postUser(user); // todo: handle errors, and return done(err) in case of exception
         done(null, user);
       }
     )
@@ -43,7 +44,8 @@ module.exports = () => {
           userName: profile.displayName,
           profileImageUrl: '',
         };
-        mariaAuth.postUser(user);
+        // await ?
+        mariaAuth.postUser(user); // todo: handle errors, and return done(err) in case of exception
         process.nextTick(() => {
           return done(null, user);
         });
@@ -58,9 +60,9 @@ module.exports = () => {
         channelID: process.env.LINE_CHANNEL_ID,
         channelSecret: process.env.LINE_CHANNEL_SECRET,
         callbackURL: "/auth/line/callback",
-        scope: ['profile', 'openid'],
-        botPrompt: 'normal',
-        uiLocales: 'en-US',
+        scope: ['profile', 'openid'], // necessary?
+        botPrompt: 'normal', // what?
+        uiLocales: 'en-US', // todo: use en-GB
       },
       (accessToken, refreshToken, profile, done) => {
         const user = {
@@ -68,7 +70,8 @@ module.exports = () => {
           userName: profile.displayName,
           profileImageUrl: profile.pictureUrl,
         };
-        mariaAuth.postUser(user);
+        // await ?
+        mariaAuth.postUser(user); // todo: handle errors, and return done(err) in case of exception
         done(null, user);
       }
     )
