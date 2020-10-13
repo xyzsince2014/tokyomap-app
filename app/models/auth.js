@@ -1,14 +1,12 @@
-// require("dotenv").config();
 const mysql = require("mysql");
 
 const maria = require("../utils/maria");
 
-// todo: use ../config/maria.dbConfig
 const dbConfig = {
-  host: "db",
-  user: "docker",
-  password: "docker",
-  database: "tokyomap_api",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
 };
 
 const postUser = async user => {
