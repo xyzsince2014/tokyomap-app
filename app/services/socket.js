@@ -6,11 +6,12 @@ const socketHandler = io => {
   io.on('connection', socket => {
     socket.on('initSocketState', async () => {
       const tweets = await mariaSocket.getTweets();
+      console.log(`initSocketState:done emits ${tweets}`);
       socket.emit('initSocketState:done', tweets);
     });
 
-    socket.on('postTweet', async ({ tweet, userId }) => {
-      await mariaSocket.postTweet({ tweet, userId });
+    socket.on('postTweet', async ({userId, geolocation, message}) => {
+      await mariaSocket.postTweet({userId, geolocation, message});
       const tweets = await mariaSocket.getTweets();
       socket.emit('postTweet:done', tweets);
       socket.broadcast.emit('postTweet:done', tweets);
