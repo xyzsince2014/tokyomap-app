@@ -6,7 +6,6 @@ const socketHandler = io => {
   io.on('connection', socket => {
     socket.on('initSocketState', async () => {
       const tweets = await mariaSocket.getTweets();
-      console.log(`initSocketState:done emits ${tweets}`);
       socket.emit('initSocketState:done', tweets);
     });
 

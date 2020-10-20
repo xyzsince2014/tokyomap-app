@@ -45,7 +45,6 @@ const getTweets = async () => {
 
 const postTweet = async ({userId, geolocation, message}) => {
     const con = mysql.createConnection(dbConfig);
-    console.log(`INSERT INTO tweets SET user_id = "${userId}", message = "${message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${geolocation[0]}, lng = ${geolocation[1]}`);
     try {
       await maria.beginTransaction(con);
       await maria.query(
