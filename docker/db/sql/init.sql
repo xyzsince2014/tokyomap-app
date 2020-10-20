@@ -17,8 +17,8 @@ CREATE TABLE tweets (
     message VARCHAR(256) NOT NULL,
     posted_at DATETIME NOT NULL,
     disappear_at DATETIME NOT NULL,
-    lat DECIMAL(10, 7) NOT NULL,
-    lng DECIMAL(10, 7) NOT NULL
+    lat DECIMAL(21, 18) NOT NULL,
+    lng DECIMAL(21, 18) NOT NULL
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_bin ENGINE=InnoDB;
 ALTER TABLE tweets ADD FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE;
 COMMIT;
