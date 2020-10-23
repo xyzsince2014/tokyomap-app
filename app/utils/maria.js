@@ -1,6 +1,6 @@
 const beginTransaction = con =>
   new Promise((resolve, reject) => {
-    con.beginTransaction((err) => {
+    con.beginTransaction(err => {
       if (err) {
         reject(err);
         return;
@@ -22,7 +22,7 @@ const query = (con, stmt, params) =>
 
 const commit = con =>
   new Promise((resolve, reject) => {
-    con.commit((err) => {
+    con.commit(err => {
       if (err) {
         reject(err);
         return;

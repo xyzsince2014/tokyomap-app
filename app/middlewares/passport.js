@@ -2,10 +2,20 @@ require("dotenv").config();
 
 const passport = require("passport");
 const TwitterStrategy = require("passport-twitter").Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
-const LineStrategy = require('passport-line-auth').Strategy;
+const FacebookStrategy = require("passport-facebook").Strategy;
+const LineStrategy = require("passport-line-auth").Strategy;
 
-const mariaAuth = require('../models/auth');
+const mariaAuth = require("../models/auth");
+
+const postProcessing = async (done, user) => {
+  try {
+    await mariaAuth.postUser(user);
+    done(null, user);
+  } catch (err) {
+    console.log(err); // todo: use CloudWatchLogs
+    done(null, false, null);
+  }
+};
 
 module.exports = () => {
   passport.use(
@@ -17,15 +27,12 @@ module.exports = () => {
         callbackURL: "/auth/twitter/callback",
         includeEmail: true,
       },
-      (token, tokenSecret, profile, done) => {
-        const user = {
+      async (token, tokenSecret, profile, done) => {
+        postProcessing(done, {
           userId: profile._json.id_str,
           userName: profile._json.screen_name,
           profileImageUrl: profile._json.profile_image_url,
-        };
-        // await ?
-        mariaAuth.postUser(user); // todo: handle errors, and return done(err) in case of exception
-        done(null, user);
+        });
       }
     )
   );
@@ -36,18 +43,13 @@ module.exports = () => {
       {
         clientID: process.env.FACEBOOK_APP_ID,
         clientSecret: process.env.FACEBOOK_APP_SECRET,
-        callbackURL: "/auth/facebook/callback"
+        callbackURL: "/auth/facebook/callback",
       },
-      (accessToken, refreshToken, profile, done) => {
-        const user = {
+      async (accessToken, refreshToken, profile, done) => {
+        postProcessing(done, {
           userId: profile.id,
           userName: profile.displayName,
-          profileImageUrl: '',
-        };
-        // await ?
-        mariaAuth.postUser(user); // todo: handle errors, and return done(err) in case of exception
-        process.nextTick(() => {
-          return done(null, user);
+          profileImageUrl: "",
         });
       }
     )
@@ -60,19 +62,16 @@ module.exports = () => {
         channelID: process.env.LINE_CHANNEL_ID,
         channelSecret: process.env.LINE_CHANNEL_SECRET,
         callbackURL: "/auth/line/callback",
-        scope: ['profile', 'openid'], // necessary?
-        botPrompt: 'normal', // what?
-        uiLocales: 'en-US', // todo: use en-GB
+        scope: ["profile", "openid"],
+        botPrompt: "normal", // what?
+        uiLocales: "en-US", // todo: use en-GB
       },
-      (accessToken, refreshToken, profile, done) => {
-        const user = {
+      async (accessToken, refreshToken, profile, done) => {
+        postProcessing(done, {
           userId: profile.id,
           userName: profile.displayName,
           profileImageUrl: profile.pictureUrl,
-        };
-        // await ?
-        mariaAuth.postUser(user); // todo: handle errors, and return done(err) in case of exception
-        done(null, user);
+        });
       }
     )
   );
@@ -81,11 +80,8 @@ module.exports = () => {
     done(null, user.userId);
   });
 
-  passport.deserializeUser(async (userId, done) => {
-    const user = {
-      userId: userId,
-    };
-    done(null, user);
+  passport.deserializeUser((userId, done) => {
+    done(null, { userId });
   });
 
   return passport;

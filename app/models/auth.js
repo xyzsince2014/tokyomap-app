@@ -14,9 +14,9 @@ const postUser = async user => {
     try {
       await maria.beginTransaction(con);
       await maria.query(con, `INSERT INTO users SET user_id="${user.userId}", user_name="${user.userName}", profile_image_url="${user.profileImageUrl}"`);
-      maria.commit(con);
+      await maria.commit(con);
     } catch (err) {
-      maria.rollback(con, err);
+      await maria.rollback(con, err);
     } finally {
       con.end();
     }
