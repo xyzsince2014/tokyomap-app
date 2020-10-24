@@ -5,8 +5,13 @@ const socketHandler = io => {
 
   io.on('connection', socket => {
     socket.on('initSocketState', async () => {
-      const tweets = await mariaSocket.getTweets();
-      socket.emit('initSocketState:done', tweets);
+      try {
+        const tweets = await mariaSocket.getTweets();
+        socket.emit('initSocketState:resolve', tweets);
+      } catch (err) {
+        console.log(`Error in getTweets() : ${err}`); // todo: use CloudWatchLog
+        socket.emit('initSocketState:reject', err);
+      }
     });
 
     socket.on('postTweet', async ({userId, geolocation, message}) => {

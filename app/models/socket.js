@@ -10,7 +10,6 @@ const dbConfig = {
 };
 
 const getTweets = async () => {
-  let tweets = [];
   const con = mysql.createConnection(dbConfig);
 
   try {
@@ -21,11 +20,13 @@ const getTweets = async () => {
     con.end();
 
     if (!records) {
-      return tweets;
+      return [];
     }
 
+    let tweets = [];
     records.map(rec => {
       tweets.push({
+        // todo: validation
         tweetId: rec.tweet_id,
         userId: rec.user_id,
         userName: rec.user_name,
@@ -39,7 +40,7 @@ const getTweets = async () => {
     });
     return tweets;
   } catch (err) {
-    console.log(`Error in fetcing all posts : ${err}`);
+    throw err;
   }
 };
 
