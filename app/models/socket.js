@@ -47,6 +47,7 @@ const getTweets = async () => {
 const postTweet = async ({userId, geolocation, message}) => {
     const con = mysql.createConnection(dbConfig);
     try {
+      // validate geolocation & message, and thow err if fail
       await maria.beginTransaction(con);
       await maria.query(
         con,
@@ -57,7 +58,7 @@ const postTweet = async ({userId, geolocation, message}) => {
     } catch (err) {
       await maria.rollback(con);
       con.end();
-      console.log(`Error inserting into posts : ${err}`);
+      throw err;
     }
 };
 

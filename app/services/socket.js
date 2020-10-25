@@ -15,10 +15,15 @@ const socketHandler = io => {
     });
 
     socket.on('postTweet', async ({userId, geolocation, message}) => {
-      await mariaSocket.postTweet({userId, geolocation, message});
-      const tweets = await mariaSocket.getTweets();
-      socket.emit('postTweet:done', tweets);
-      socket.broadcast.emit('postTweet:done', tweets);
+      try {
+        await mariaSocket.postTweet({userId, geolocation, message});
+        const tweets = await mariaSocket.getTweets();
+        socket.emit('postTweet:resolve', tweets);
+        socket.broadcast.emit('postTweet:resolve', tweets);
+      } catch (err) {
+        console.log(`Error in postTweet() : ${err}`); // todo: use CloudWatchLog
+        socket.emit('postTweet:reject', err);
+      }
     });
   });
 };
