@@ -26,7 +26,6 @@ const getTweets = async () => {
     let tweets = [];
     records.map(rec => {
       tweets.push({
-        // todo: validation
         tweetId: rec.tweet_id,
         userId: rec.user_id,
         userName: rec.user_name,
