@@ -13,8 +13,7 @@ const postUser = async user => {
     const con = mysql.createConnection(dbConfig);
     try {
       await maria.beginTransaction(con);
-      // todo: https://qiita.com/yuzroz/items/f0eccf847b2ea42f885f
-      await maria.query(con, `INSERT INTO users SET user_id="${user.userId}", user_name="${user.userName}", profile_image_url="${user.profileImageUrl}"`);
+      await maria.query(con, `INSERT INTO users SET user_id="${user.userId}", user_name="${user.userName}", profile_image_url="${user.profileImageUrl}" ON DUPLICATE KEY UPDATE user_name="${user.userName}", profile_image_url="${user.profileImageUrl}"`);
       await maria.commit(con);
     } catch (err) {
       await maria.rollback(con, err);
