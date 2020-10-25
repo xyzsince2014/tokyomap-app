@@ -14,7 +14,7 @@ DROP TABLE IF EXISTS tweets;
 CREATE TABLE tweets (
     tweet_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(128) NOT NULL,
-    message VARCHAR(256) NOT NULL,
+    message VARCHAR(255) NOT NULL,
     posted_at DATETIME NOT NULL,
     disappear_at DATETIME NOT NULL,
     lat DECIMAL(21, 18) NOT NULL,
