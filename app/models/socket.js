@@ -1,6 +1,6 @@
-const mysql = require("mysql");
+const mysql = require('mysql');
 
-const maria = require("../utils/maria");
+const maria = require('../utils/maria');
 
 const dbConfig = {
   host: process.env.DB_HOST,
@@ -15,7 +15,7 @@ const getTweets = async () => {
   try {
     const records = await maria.query(
       con,
-      "SELECT * FROM tweets as t JOIN users AS u ON t.user_id = u.user_id WHERE posted_at > (NOW() + INTERVAL - 90 MINUTE) ORDER BY posted_at LIMIT 100"
+      'SELECT * FROM tweets as t JOIN users AS u ON t.user_id = u.user_id WHERE posted_at > (NOW() + INTERVAL - 90 MINUTE) ORDER BY posted_at LIMIT 100'
     );
     con.end();
 
@@ -45,24 +45,33 @@ const getTweets = async () => {
 };
 
 const postTweet = async ({userId, geolocation, message}) => {
-    const con = mysql.createConnection(dbConfig);
-    try {
-      // validate geolocation & message, and thow err if fail
-      await maria.beginTransaction(con);
-      await maria.query(
-        con,
-        `INSERT INTO tweets SET user_id = "${userId}", message = "${message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${geolocation[0]}, lng = ${geolocation[1]}`,
-      );
-      maria.commit(con);
-      con.end();
-    } catch (err) {
-      await maria.rollback(con);
-      con.end();
-      throw err;
-    }
+  if (
+    !userId ||
+    !geolocation[0] ||
+    !geolocation[1] ||
+    !message ||
+    !(Buffer.byteLength(message, 'utf-8') < 256)
+  ) {
+    throw new Error('invalid input');
+  }
+
+  const con = mysql.createConnection(dbConfig);
+  try {
+    await maria.beginTransaction(con);
+    await maria.query(
+      con,
+      `INSERT INTO tweets SET user_id = '${userId}', message = '${message}', posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${geolocation[0]}, lng = ${geolocation[1]}`
+    );
+    await maria.commit(con);
+    con.end();
+  } catch (err) {
+    await maria.rollback(con);
+    con.end();
+    throw err;
+  }
 };
 
 module.exports = {
   getTweets,
-  postTweet
+  postTweet,
 };
