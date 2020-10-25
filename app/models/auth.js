@@ -19,7 +19,14 @@ const postUser = async user => {
     await maria.beginTransaction(con);
     await maria.query(
       con,
-      `INSERT INTO users SET user_id='${user.userId}', user_name='${user.userName}', profile_image_url='${user.profileImageUrl}' ON DUPLICATE KEY UPDATE user_name='${user.userName}', profile_image_url='${user.profileImageUrl}'`
+      'INSERT INTO users SET user_id=?, user_name=?, profile_image_url=? ON DUPLICATE KEY UPDATE user_name=?, profile_image_url=?',
+      [
+        user.userId,
+        user.userName,
+        user.profileImageUrl,
+        user.userName,
+        user.profileImageUrl
+      ]
     );
     await maria.commit(con);
   } catch (err) {
