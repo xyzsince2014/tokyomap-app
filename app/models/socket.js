@@ -1,6 +1,6 @@
-const mysql = require("mysql");
+const mysql = require('mysql');
 
-const maria = require("../utils/maria");
+const maria = require('../utils/maria');
 
 const dbConfig = {
   host: process.env.DB_HOST,
@@ -10,20 +10,20 @@ const dbConfig = {
 };
 
 const getTweets = async () => {
-  let tweets = [];
   const con = mysql.createConnection(dbConfig);
 
   try {
     const records = await maria.query(
       con,
-      "SELECT * FROM tweets as t JOIN users AS u ON t.user_id = u.user_id WHERE posted_at > (NOW() + INTERVAL - 90 MINUTE) ORDER BY posted_at LIMIT 100"
+      'SELECT * FROM tweets as t JOIN users AS u ON t.user_id = u.user_id WHERE posted_at > (NOW() + INTERVAL - 90 MINUTE) ORDER BY posted_at LIMIT 100'
     );
     con.end();
 
     if (!records) {
-      return tweets;
+      return [];
     }
 
+    let tweets = [];
     records.map(rec => {
       tweets.push({
         tweetId: rec.tweet_id,
@@ -39,28 +39,44 @@ const getTweets = async () => {
     });
     return tweets;
   } catch (err) {
-    console.log(`Error in fetcing all posts : ${err}`);
+    throw err;
   }
 };
 
 const postTweet = async ({userId, geolocation, message}) => {
-    const con = mysql.createConnection(dbConfig);
-    try {
-      await maria.beginTransaction(con);
-      await maria.query(
-        con,
-        `INSERT INTO tweets SET user_id = "${userId}", message = "${message}", posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ${geolocation[0]}, lng = ${geolocation[1]}`,
-      );
-      maria.commit(con);
-      con.end();
-    } catch (err) {
-      await maria.rollback(con);
-      con.end();
-      console.log(`Error inserting into posts : ${err}`);
-    }
+  if (
+    !userId ||
+    !geolocation[0] ||
+    !geolocation[1] ||
+    !message ||
+    !(Buffer.byteLength(message, 'utf-8') < 256)
+  ) {
+    throw new Error('invalid input');
+  }
+
+  const con = mysql.createConnection(dbConfig);
+  try {
+    await maria.beginTransaction(con);
+    await maria.query(
+      con,
+      'INSERT INTO tweets SET user_id = ?, message = ?, posted_at = NOW(), disappear_at = (NOW() + INTERVAL 90 MINUTE), lat = ?, lng = ?',
+      [
+        userId,
+        message,
+        geolocation[0],
+        geolocation[1]
+      ]
+    );
+    await maria.commit(con);
+    con.end();
+  } catch (err) {
+    await maria.rollback(con);
+    con.end();
+    throw err;
+  }
 };
 
 module.exports = {
   getTweets,
-  postTweet
+  postTweet,
 };

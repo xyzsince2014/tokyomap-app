@@ -5,7 +5,7 @@ const authController = require("../controllers/auth");
 dotenv.config();
 const sessionConfig = {
   successRedirect: process.env.DOMAIN_CLIENT,
-  failureRedirect: process.env.DOMAIN_CLIENT,
+  failureRedirect: 'https://www.google.com/', // todo: redirect to the error page hosted on S3
   session: true,
 };
 
