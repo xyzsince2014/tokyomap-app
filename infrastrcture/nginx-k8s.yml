@@ -1,0 +1,21 @@
+# manifesto version
+apiVersion: v1
+
+# kind of the object to create
+kind: Pod
+metadata:
+  # pod name
+  name: nginx-pod
+  # Services & Deployments uses labels to identify pods
+  labels:
+    app: nginx-app
+spec:
+  # containers in the pod
+  containers:
+    # container name
+  - name: nginx-container
+    # container image to use
+    image: nginx
+    ports:
+      # port the container opens
+      - containerPort: 80
