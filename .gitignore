@@ -2,4 +2,4 @@
 docker/**/var/*
 *.log
 **/.DS_Store
-app/.env
+**/*.env
