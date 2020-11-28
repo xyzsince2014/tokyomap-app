@@ -22,6 +22,8 @@ services:
         # todo: use Dockerfile and CentOS instead of mariadb/server
         image: mariadb/server
         container_name: tokyomap.api-db
+        environment:
+            TZ: 'Asia/Tokyo'
         env_file: ./.dev.env
         command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
         volumes:
