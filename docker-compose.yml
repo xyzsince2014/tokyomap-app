@@ -3,7 +3,7 @@ services:
     app:
         build:
             context: ./docker/app # the dir the Dockerfile is in
-        image: tokyomap.api_app # image name
+        image: tokyomap.api-app # image name
         container_name: tokyomap.api-app
         ports:
             - "4000:4000"
@@ -14,7 +14,7 @@ services:
     web:
         build:
             context: ./docker/web
-        image: tokyomap.api_web
+        image: tokyomap.api-web
         container_name: tokyomap.api-web
         ports:
             - "80:80"
