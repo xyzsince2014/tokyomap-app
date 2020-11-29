@@ -9,6 +9,8 @@ services:
                 DB_USER: docker
                 DB_PASSWORD: docker
                 DB_DATABASE: tokyomap_api
+                COOKIE_SECRET_KEY: hoge
+                DOMAIN_CLIENT: http://localhost:3000
         image: tokyomap.api/app:dev # image name
         container_name: tokyomap.api-app
         ports:
@@ -16,6 +18,8 @@ services:
         volumes:
             - "./app:/src"
         env_file: ./app/.env
+        environment:
+            PORT: 4000
         command:  [sh, -c, yarn install && yarn start]
     web:
         build:
