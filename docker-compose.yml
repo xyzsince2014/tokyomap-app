@@ -3,6 +3,12 @@ services:
     app:
         build:
             context: ./app # the dir the Dockerfile is in
+            args:
+                NODE_ENV: "development"
+                DB_HOST=: "db"
+                DB_USER: "docker"
+                DB_PASSWORD: "docker"
+                DB_DATABASE: "tokyomap_api"
         image: tokyomap.api/app:dev # image name
         container_name: tokyomap.api-app
         ports:
