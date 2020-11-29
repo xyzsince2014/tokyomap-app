@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const passport = require("passport");
 const TwitterStrategy = require("passport-twitter").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;

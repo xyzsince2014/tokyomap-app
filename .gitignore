@@ -1,5 +1,6 @@
 **/node_modules/
-docker/**/var/*
-*.log
+aws/ecr/*.sh
+db/var/**/*
+**/*.log
 **/.DS_Store
 **/*.env

@@ -2,24 +2,23 @@ version: "3"
 services:
     app:
         build:
-            context: ./docker/app # the dir the Dockerfile is in
-        image: tokyomap.api-app # image name
+            context: ./app # the dir the Dockerfile is in
+        image: tokyomap.api/app:dev # image name
         container_name: tokyomap.api-app
         ports:
             - "4000:4000"
         volumes:
             - "./app:/src"
-        env_file: ./.dev.env
+        env_file: ./app/.env
         command:  [sh, -c, yarn install && yarn start]
     web:
         build:
-            context: ./docker/web
-        image: tokyomap.api-web
+            context: ./web
+        image: tokyomap.api/web:dev
         container_name: tokyomap.api-web
         ports:
             - "80:80"
     db:
-        # todo: use Dockerfile and CentOS instead of mariadb/server
         image: mariadb/server
         container_name: tokyomap.api-db
         environment:
@@ -28,11 +27,10 @@ services:
             MYSQL_USER: docker
             MYSQL_PASSWORD: docker
             TZ: 'Asia/Tokyo'
-        env_file: ./.dev.env
         command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
         volumes:
-            - ./docker/db/var:/var/lib/mysql
-            - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf # config
-            - ./docker/db/sql:/docker-entrypoint-initdb.d
+            - ./db/var:/var/lib/mysql
+            - ./db/my.cnf:/etc/mysql/conf.d/my.cnf # config
+            - ./db/sql:/docker-entrypoint-initdb.d
         ports:
             - "3306:3306"
