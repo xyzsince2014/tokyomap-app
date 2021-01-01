@@ -20,7 +20,7 @@ services:
         env_file: ./app/.env
         environment:
             PORT: 4000
-        command:  [sh, -c, yarn install && yarn start]
+        command:  [sh, -c, yarn start]
     db:
         image: mariadb/server
         container_name: tokyomap.api-db
