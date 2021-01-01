@@ -21,13 +21,6 @@ services:
         environment:
             PORT: 4000
         command:  [sh, -c, yarn install && yarn start]
-    web:
-        build:
-            context: ./web
-        image: tokyomap.api/web:dev
-        container_name: tokyomap.api-web
-        ports:
-            - "80:80"
     db:
         image: mariadb/server
         container_name: tokyomap.api-db
