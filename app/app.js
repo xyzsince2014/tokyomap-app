@@ -10,10 +10,8 @@ const router = require('./routes/index');
 
 // configs
 const passport = require('./middlewares/passport')();
-const redisClient = redis.createClient({
-  host: '127.0.0.1',
-  port: 6379
-});
+// const redisClient = redis.createClient(6379, 'redis');
+const redisClient = redis.createClient(6379, process.env.REDIS_ENDPOINT);
 const app = express();
 
 // middlewares

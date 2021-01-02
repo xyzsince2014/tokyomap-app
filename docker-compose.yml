@@ -11,6 +11,7 @@ services:
                 DB_DATABASE: tokyomap_api
                 COOKIE_SECRET_KEY: hoge
                 DOMAIN_CLIENT: http://localhost:3000
+                REDIS_ENDPOINT: redis
         image: tokyomap.api/app:dev
         container_name: tokyomap.api-app
         ports:
