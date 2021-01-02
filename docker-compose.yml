@@ -2,7 +2,7 @@ version: "3"
 services:
     app:
         build:
-            context: ./app # the dir the Dockerfile is in
+            context: ./app
             args:
                 NODE_ENV: development
                 DB_HOST: db
@@ -11,7 +11,7 @@ services:
                 DB_DATABASE: tokyomap_api
                 COOKIE_SECRET_KEY: hoge
                 DOMAIN_CLIENT: http://localhost:3000
-        image: tokyomap.api/app:dev # image name
+        image: tokyomap.api/app:dev
         container_name: tokyomap.api-app
         ports:
             - "4000:4000"
@@ -35,3 +35,10 @@ services:
             - ./db/sql:/docker-entrypoint-initdb.d
         ports:
             - "3306:3306"
+    redis:
+        image: "redis:latest"
+        container_name: tokyomap.api-redis
+        volumes:
+            - "./redis/data:/data"
+        ports:
+            - "6379:6379"

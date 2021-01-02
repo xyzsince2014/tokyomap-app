@@ -3,11 +3,17 @@ const methodOverride = require("method-override");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const redis = require('redis');
+const RedisStore = require('connect-redis')(session);
 
 const router = require('./routes/index');
 
 // configs
 const passport = require('./middlewares/passport')();
+const redisClient = redis.createClient({
+  host: '127.0.0.1',
+  port: 6379
+});
 const app = express();
 
 // middlewares
@@ -21,13 +27,8 @@ app
       secret: process.env.COOKIE_SECRET_KEY,
       resave: false,
       saveUninitialized: false,
-      cookie: {
-        httpOnly: false,
-        secure: false,
-        // httpOnly: true,
-        // secure: true,
-        maxAge: 1000 * 60 * 15,
-      },
+      store: new RedisStore({ client: redisClient }),
+      cookie: { httpOnly: true, secure: false, maxage: 1000 * 60 * 30 }
     })
   )
   .use(passport.initialize())
