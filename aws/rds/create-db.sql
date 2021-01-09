@@ -1,2 +1,0 @@
-DROP DATABASE IF EXISTS tokyomap_api;
-CREATE DATABASE tokyomap_api CHARACTER SET utf8;
