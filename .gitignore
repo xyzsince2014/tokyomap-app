@@ -1,6 +1,6 @@
 **/node_modules/
-aws/ecr/*.sh
 db/var/**/*
+redis/**/*
 **/*.log
 **/.DS_Store
 **/*.env
