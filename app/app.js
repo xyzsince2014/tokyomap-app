@@ -7,21 +7,18 @@ const redis = require('redis');
 const RedisStore = require('connect-redis')(session);
 
 const router = require('./routes/index');
-
-// configs
 const passport = require('./middlewares/passport')();
-// const redisClient = redis.createClient(6379, 'redis');
+
 const redisClient = redis.createClient(6379, process.env.REDIS_ENDPOINT);
 const app = express();
 
-// middlewares
 app
   .use(methodOverride("_method", { methods: ["POST", "GET"] }))
   .use(cookieParser())
   .use(express.urlencoded({ extended: true }))
   .use(express.json())
   .use(
-    session({ // cf. https://www.npmjs.com/package/express-session
+    session({
       secret: process.env.COOKIE_SECRET_KEY,
       resave: false,
       saveUninitialized: false,
@@ -38,6 +35,6 @@ app
       credentials: true
     })
   )
-  .use("/", router(passport)); // routings
+  .use("/", router(passport));
 
 module.exports = app;
