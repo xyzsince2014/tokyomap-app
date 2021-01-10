@@ -22,7 +22,7 @@ module.exports = () => {
       {
         consumerKey: process.env.TWITTER_CONSUMER_KEY,
         consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-        callbackURL: "/auth/twitter/callback",
+        callbackURL: `${process.env.DOMAIN_API}/auth/twitter/callback`,
         includeEmail: true,
       },
       async (token, tokenSecret, profile, done) => {
@@ -41,7 +41,7 @@ module.exports = () => {
       {
         clientID: process.env.FACEBOOK_APP_ID,
         clientSecret: process.env.FACEBOOK_APP_SECRET,
-        callbackURL: "/auth/facebook/callback",
+        callbackURL: `${process.env.DOMAIN_API}/auth/facebook/callback`,
       },
       async (accessToken, refreshToken, profile, done) => {
         postProcessing(done, {
@@ -59,7 +59,7 @@ module.exports = () => {
       {
         channelID: process.env.LINE_CHANNEL_ID,
         channelSecret: process.env.LINE_CHANNEL_SECRET,
-        callbackURL: "/auth/line/callback",
+        callbackURL: `${process.env.DOMAIN_API}/auth/line/callback`,
         scope: ["profile", "openid"],
         botPrompt: "normal", // what?
         uiLocales: "en-US", // todo: use en-GB

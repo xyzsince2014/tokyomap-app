@@ -23,7 +23,11 @@ app
       resave: false,
       saveUninitialized: false,
       store: new RedisStore({ client: redisClient }),
-      cookie: { httpOnly: true, secure: false, maxage: 1000 * 60 * 30 }
+      cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV == 'production',
+        maxAge: 1000 * 60 * 30,
+      }
     })
   )
   .use(passport.initialize())
