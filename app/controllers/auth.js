@@ -1,11 +1,10 @@
-const httpStatus = require("http-status-codes")
+const httpStatus = require("http-status-codes");
 
 const authenticate = (req, res) => {
   if(req.isAuthenticated()) {
     res.status(httpStatus.OK).json({
       isAuthenticated: true,
       user: req.user,
-      cookies: req.cookies
     });
     return;
   }

@@ -26,10 +26,12 @@ module.exports = () => {
         includeEmail: true,
       },
       async (token, tokenSecret, profile, done) => {
-        postProcessing(done, {
+        await postProcessing(done, {
           userId: profile._json.id_str,
           userName: profile._json.screen_name,
           profileImageUrl: profile._json.profile_image_url,
+          accessToken: token,
+          refreshToken: tokenSecret
         });
       }
     )
@@ -44,10 +46,12 @@ module.exports = () => {
         callbackURL: `${process.env.DOMAIN_API}/auth/facebook/callback`,
       },
       async (accessToken, refreshToken, profile, done) => {
-        postProcessing(done, {
+        await postProcessing(done, {
           userId: profile.id,
           userName: profile.displayName,
           profileImageUrl: "",
+          accessToken: accessToken,
+          refreshToken: refreshToken
         });
       }
     )
@@ -65,21 +69,23 @@ module.exports = () => {
         uiLocales: "en-US", // todo: use en-GB
       },
       async (accessToken, refreshToken, profile, done) => {
-        postProcessing(done, {
+        await postProcessing(done, {
           userId: profile.id,
           userName: profile.displayName,
           profileImageUrl: profile.pictureUrl,
+          accessToken: accessToken,
+          refreshToken: refreshToken
         });
       }
     )
   );
 
   passport.serializeUser((user, done) => {
-    done(null, user.userId);
+    done(null, user);
   });
 
-  passport.deserializeUser((userId, done) => {
-    done(null, { userId });
+  passport.deserializeUser((user, done) => {
+    done(null, user);
   });
 
   return passport;
