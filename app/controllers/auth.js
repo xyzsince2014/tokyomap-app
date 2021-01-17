@@ -4,7 +4,7 @@ const authenticate = (req, res) => {
   if(req.isAuthenticated()) {
     res.status(httpStatus.OK).json({
       isAuthenticated: true,
-      user: req.user,
+      user: {userId: req.user.userId}
     });
     return;
   }
