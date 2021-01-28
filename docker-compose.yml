@@ -43,3 +43,11 @@ services:
             - "./redis/data:/data"
         ports:
             - "6379:6379"
+    web:
+        build:
+            context: ./web
+        container_name: tokyomap.api-web
+        volumes:
+          - "./web/public:/usr/share/nginx"
+        ports:
+            - "80:80"
