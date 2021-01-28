@@ -25,9 +25,9 @@ app
       store: new RedisStore({ client: redisClient }),
       cookie: {
         httpOnly: true,
-        // secure: process.env.NODE_ENV == 'production',
-        secure: false,
-        sameSite: "none",
+        secure: process.env.NODE_ENV == 'production',
+        sameSite: "lax", // chrome malfunctioning
+        // sameSite: "strict", // chrome & FF malfunctioning
         maxAge: 1000 * 60 * 30,
       }
     })
