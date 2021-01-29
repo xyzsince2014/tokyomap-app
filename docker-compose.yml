@@ -10,15 +10,14 @@ services:
                 DB_PASSWORD: docker
                 DB_DATABASE: tokyomap_api
                 COOKIE_SECRET_KEY: hoge
-                DOMAIN_API: http://localhost/api
-                DOMAIN_WEB: http://localhost
+                DOMAIN_API: https://localhost/api
+                DOMAIN_WEB: https://localhost
                 REDIS_ENDPOINT: redis
                 PORT: 4000
         image: tokyomap.app:dev
         container_name: tokyomap-app
         ports:
             - "4000:4000"
-        # network_mode: "host"
         env_file: ./app/.dev.env
         command:  [sh, -c, yarn start]
     db:
@@ -33,11 +32,10 @@ services:
         command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
         volumes:
             - ./db/var:/var/lib/mysql
-            - ./db/my.cnf:/etc/mysql/conf.d/my.cnf # config
+            - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
             - ./db/sql:/docker-entrypoint-initdb.d
         ports:
             - "3306:3306"
-        # network_mode: "host"
     redis:
         image: "redis:latest"
         container_name: tokyomap-redis
@@ -45,4 +43,3 @@ services:
             - "./redis/data:/data"
         ports:
             - "6379:6379"
-        # network_mode: "host"
