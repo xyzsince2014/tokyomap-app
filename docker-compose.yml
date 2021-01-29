@@ -14,15 +14,16 @@ services:
                 DOMAIN_CLIENT: http://localhost
                 REDIS_ENDPOINT: redis
                 PORT: 4000
-        image: tokyomap.api/app:dev
-        container_name: tokyomap.api-app
+        image: tokyomap.app:dev
+        container_name: tokyomap-app
         ports:
             - "4000:4000"
-        env_file: ./app/.env
+        # network_mode: "host"
+        env_file: ./app/.dev.env
         command:  [sh, -c, yarn start]
     db:
         image: mariadb/server
-        container_name: tokyomap.api-db
+        container_name: tokyomap-db
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: tokyomap_api
@@ -36,19 +37,12 @@ services:
             - ./db/sql:/docker-entrypoint-initdb.d
         ports:
             - "3306:3306"
+        # network_mode: "host"
     redis:
         image: "redis:latest"
-        container_name: tokyomap.api-redis
+        container_name: tokyomap-redis
         volumes:
             - "./redis/data:/data"
         ports:
             - "6379:6379"
-    web:
-        build:
-            context: ./web
-        container_name: tokyomap.api-web
-        volumes:
-          - "./web/public:/usr/share/nginx"
-        ports:
-            - "80:80"
-            # - "444:443"
+        # network_mode: "host"
