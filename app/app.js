@@ -36,7 +36,7 @@ app
   .use(passport.session()) // enables passport.js to store auth info in the session
   .use(
     cors({
-      origin: process.env.DOMAIN_CLIENT,
+      origin: process.env.DOMAIN_WEB,
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       credentials: true
     })
