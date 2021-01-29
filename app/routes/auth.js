@@ -2,7 +2,7 @@ const router = require("express").Router();
 const authController = require("../controllers/auth");
 
 const sessionConfig = {
-  successRedirect: process.env.DOMAIN_CLIENT,
+  successRedirect: process.env.DOMAIN_WEB,
   failureRedirect: 'https://www.google.com/', // todo: redirect to the error page hosted on S3
   session: true,
 };

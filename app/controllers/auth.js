@@ -16,7 +16,7 @@ const authenticate = (req, res) => {
 
 const signout = (req, res) => {
   req.logout();
-  res.redirect(process.env.DOMAIN_CLIENT);
+  res.redirect(process.env.DOMAIN_WEB);
 };
 
 module.exports = {
