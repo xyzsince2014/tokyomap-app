@@ -1,4 +1,4 @@
-USE tokyomap_api;
+USE tokyomap;
 
 START TRANSACTION;
 DROP TABLE IF EXISTS users;

@@ -8,7 +8,7 @@ services:
                 DB_HOST: db
                 DB_USER: docker
                 DB_PASSWORD: docker
-                DB_DATABASE: tokyomap_api
+                DB_DATABASE: tokyomap
                 COOKIE_SECRET_KEY: hoge
                 DOMAIN_API: https://localhost/api
                 DOMAIN_WEB: https://localhost
@@ -25,7 +25,7 @@ services:
         container_name: tokyomap-db
         environment:
             MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: tokyomap_api
+            MYSQL_DATABASE: tokyomap
             MYSQL_USER: docker
             MYSQL_PASSWORD: docker
             TZ: Asia/Tokyo
