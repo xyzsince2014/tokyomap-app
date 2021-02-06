@@ -20,14 +20,16 @@ app
   .use(
     session({
       secret: process.env.COOKIE_SECRET_KEY,
+      proxy: true,
       resave: false,
       saveUninitialized: false,
       store: new RedisStore({ client: redisClient }),
       cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV == 'production',
-        sameSite: "lax", // chrome malfunctioning
-        // sameSite: "strict", // chrome & FF malfunctioning
+        // todo: secure: process.env.NODE_ENV == 'production',
+        secure: false,
+        sameSite: "lax",
+        // todo: sameSite: "strict",
         maxAge: 1000 * 60 * 30,
       }
     })
