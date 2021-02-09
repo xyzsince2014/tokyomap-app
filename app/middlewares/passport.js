@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const passport = require("passport");
 const TwitterStrategy = require("passport-twitter").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
@@ -24,14 +22,16 @@ module.exports = () => {
       {
         consumerKey: process.env.TWITTER_CONSUMER_KEY,
         consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-        callbackURL: "/auth/twitter/callback",
+        callbackURL: `${process.env.DOMAIN_API}/auth/twitter/callback`,
         includeEmail: true,
       },
       async (token, tokenSecret, profile, done) => {
-        postProcessing(done, {
+        await postProcessing(done, {
           userId: profile._json.id_str,
           userName: profile._json.screen_name,
           profileImageUrl: profile._json.profile_image_url,
+          accessToken: token,
+          refreshToken: tokenSecret
         });
       }
     )
@@ -43,13 +43,15 @@ module.exports = () => {
       {
         clientID: process.env.FACEBOOK_APP_ID,
         clientSecret: process.env.FACEBOOK_APP_SECRET,
-        callbackURL: "/auth/facebook/callback",
+        callbackURL: `${process.env.DOMAIN_API}/auth/facebook/callback`,
       },
       async (accessToken, refreshToken, profile, done) => {
-        postProcessing(done, {
+        await postProcessing(done, {
           userId: profile.id,
           userName: profile.displayName,
           profileImageUrl: "",
+          accessToken: accessToken,
+          refreshToken: refreshToken
         });
       }
     )
@@ -61,27 +63,29 @@ module.exports = () => {
       {
         channelID: process.env.LINE_CHANNEL_ID,
         channelSecret: process.env.LINE_CHANNEL_SECRET,
-        callbackURL: "/auth/line/callback",
+        callbackURL: `${process.env.DOMAIN_API}/auth/line/callback`,
         scope: ["profile", "openid"],
         botPrompt: "normal", // what?
         uiLocales: "en-US", // todo: use en-GB
       },
       async (accessToken, refreshToken, profile, done) => {
-        postProcessing(done, {
+        await postProcessing(done, {
           userId: profile.id,
           userName: profile.displayName,
           profileImageUrl: profile.pictureUrl,
+          accessToken: accessToken,
+          refreshToken: refreshToken
         });
       }
     )
   );
 
   passport.serializeUser((user, done) => {
-    done(null, user.userId);
+    done(null, user);
   });
 
-  passport.deserializeUser((userId, done) => {
-    done(null, { userId });
+  passport.deserializeUser((user, done) => {
+    done(null, user);
   });
 
   return passport;

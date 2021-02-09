@@ -1,11 +1,10 @@
-const httpStatus = require("http-status-codes")
+const httpStatus = require("http-status-codes");
 
 const authenticate = (req, res) => {
   if(req.isAuthenticated()) {
     res.status(httpStatus.OK).json({
       isAuthenticated: true,
-      user: req.user,
-      cookies: req.cookies
+      user: {userId: req.user.userId}
     });
     return;
   }
@@ -17,7 +16,7 @@ const authenticate = (req, res) => {
 
 const signout = (req, res) => {
   req.logout();
-  res.redirect(process.env.DOMAIN_CLIENT);
+  res.redirect(process.env.DOMAIN_WEB);
 };
 
 module.exports = {

@@ -2,35 +2,44 @@ version: "3"
 services:
     app:
         build:
-            context: ./docker/app # the dir the Dockerfile is in
-        image: tokyomap.api_app # image name
-        container_name: tokyomap.api_app
+            context: ./app
+            args:
+                NODE_ENV: development
+                DB_HOST: db
+                DB_USER: docker
+                DB_PASSWORD: docker
+                DB_DATABASE: tokyomap
+                COOKIE_SECRET_KEY: hoge
+                DOMAIN_API: https://localhost/api
+                DOMAIN_WEB: https://localhost
+                REDIS_ENDPOINT: redis
+                PORT: 4000
+        image: tokyomap.app:dev
+        container_name: tokyomap-app
         ports:
             - "4000:4000"
-        volumes:
-            - "./app:/src"
-        command:  [sh, -c, yarn install && yarn start]
-    web:
-        build:
-            context: ./docker/web
-        image: tokyomap.api_web
-        container_name: tokyomap.api_web
-        ports:
-            - "80:80"
+        env_file: ./app/.dev.env
+        command:  [sh, -c, yarn start]
     db:
-        # todo: use Dockerfile and CentOS instead of mariadb/server
         image: mariadb/server
-        container_name: tokyomap.api_db
+        container_name: tokyomap-db
         environment:
             MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: tokyomap_api
+            MYSQL_DATABASE: tokyomap
             MYSQL_USER: docker
             MYSQL_PASSWORD: docker
-            TZ: 'Asia/Tokyo'
+            TZ: Asia/Tokyo
         command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
         volumes:
-            - ./docker/db/var:/var/lib/mysql
-            - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf # config
-            - ./docker/db/sql:/docker-entrypoint-initdb.d
+            - ./db/var:/var/lib/mysql
+            - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+            - ./db/sql:/docker-entrypoint-initdb.d
         ports:
             - "3306:3306"
+    redis:
+        image: "redis:latest"
+        container_name: tokyomap-redis
+        volumes:
+            - "./redis/data:/data"
+        ports:
+            - "6379:6379"

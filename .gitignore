@@ -1,5 +1,7 @@
 **/node_modules/
-docker/**/var/*
-*.log
+db/var/**/*
+web/public/**/*
+redis/**/*
+**/*.log
 **/.DS_Store
-app/.env
+**/*.env
