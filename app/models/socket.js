@@ -29,7 +29,7 @@ const getTweets = async () => {
         tweetId: rec.tweet_id,
         userId: rec.user_id,
         userName: rec.user_name,
-        profileImageUrl: rec.profile_image_url ? rec.profile_image_url : '',
+        profileImageUrl: /^https/.test(rec.profile_image_url) ? rec.profile_image_url : null,
         message: rec.message,
         postedAt: rec.posted_at,
         disappearAt: rec.disappear_at,
