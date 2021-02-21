@@ -1,0 +1,13 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+  build:
+    commands:
+      - docker build -t ${ECR_REPO}:${VERSION} --build-arg NODE_ENV="production" --build-arg DB_HOST="${DB_HOST}" --build-arg DB_USER="${DB_USER}" --build-arg DB_PASSWORD="${DB_PASSWORD}" --build-arg DB_DATABASE="${DB_DATABASE}" --build-arg COOKIE_SECRET_KEY="${COOKIE_SECRET_KEY}" --build-arg TWITTER_CONSUMER_KEY="${TWITTER_CONSUMER_KEY}" --build-arg TWITTER_CONSUMER_SECRET="${TWITTER_CONSUMER_SECRET}" --build-arg FACEBOOK_APP_ID="${FACEBOOK_APP_ID}" --build-arg FACEBOOK_APP_SECRET="${FACEBOOK_APP_SECRET}" --build-arg LINE_CHANNEL_ID="${LINE_CHANNEL_ID}" --build-arg LINE_CHANNEL_SECRET="${LINE_CHANNEL_SECRET}" --build-arg DOMAIN_API="${DOMAIN_API}" --build-arg DOMAIN_WEB="${DOMAIN_WEB}" --build-arg REDIS_ENDPOINT="${REDIS_ENDPOINT}" --build-arg PORT="${PORT}" app
+  post_build:
+    commands:
+      - aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPO}
+      - docker push ${ECR_REPO}:${VERSION}
