@@ -3,43 +3,46 @@ const methodOverride = require("method-override");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const redis = require('redis');
+const RedisStore = require('connect-redis')(session);
 
 const router = require('./routes/index');
+const passport = require('./middlewares/passport')();
 
-// configs
-const passport = require('./auth/passport')();
+const redisClient = redis.createClient(6379, process.env.REDIS_ENDPOINT);
 const app = express();
 
-// middlewares
 app
-  .use(methodOverride("_method", { methods: ["POST", "GET"] })) // option methods must be an array of upper-case strings
-  .use(cookieParser()) // enables to fetch cookie in request headers by req.cookies
-  .use(express.urlencoded({ extended: true })) // enables to fetch incoming data by req.body.hoge for POST & PUT methods
+  .use(methodOverride("_method", { methods: ["POST", "GET"] }))
+  .use(cookieParser())
+  .use(express.urlencoded({ extended: true }))
   .use(express.json())
   .use(
     session({
-      // cf. https://qiita.com/hika7719/items/3282ab2ebcdaf080912e
-      secret: 'keyboard cat',
+      secret: process.env.COOKIE_SECRET_KEY,
+      proxy: true,
       resave: false,
       saveUninitialized: false,
+      store: new RedisStore({ client: redisClient }),
       cookie: {
-        httpOnly: false,
+        httpOnly: true,
+        // todo: secure: process.env.NODE_ENV == 'production',
         secure: false,
-        // httpOnly: true,
-        // secure: true,
-        maxAge: 1000 * 60 * 15, // 15 min
-      },
+        sameSite: "lax",
+        // todo: sameSite: "strict",
+        maxAge: 1000 * 60 * 30,
+      }
     })
   )
-  .use(passport.initialize()) // use session() before passport.session() to ensure that the login session is restored in the correct order
-  .use(passport.session()) // executes .use(passport.authenticate('hoge')) to enable persistent auth sessions, cf. https://applingo.tokyo/article/1700
+  .use(passport.initialize())
+  .use(passport.session()) // enables passport.js to store auth info in the session
   .use(
     cors({
-      origin: "http://localhost:3000", // allow to server to accept request from different origin
+      origin: process.env.DOMAIN_WEB,
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-      credentials: true // allow session cookie from browser to pass through
+      credentials: true
     })
   )
-  .use("/", router(passport)); // routings
+  .use("/", router(passport));
 
 module.exports = app;

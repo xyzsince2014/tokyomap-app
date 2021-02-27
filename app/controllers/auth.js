@@ -1,28 +1,25 @@
-const index = (req, res) => {
-  if (req.user) {
-    res.json({
-      success: true,
-      message: "user has successfully authenticated",
-      user: req.user,
-      cookies: req.cookies
-    });
-  }
-};
+const httpStatus = require("http-status-codes");
 
-const notifyLoginFailure = (req, res) => {
-  res.status(401).json({
-    success: false,
-    message: "user failed to authenticate."
+const authenticate = (req, res) => {
+  if(req.isAuthenticated()) {
+    res.status(httpStatus.OK).json({
+      isAuthenticated: true,
+      user: {userId: req.user.userId}
+    });
+    return;
+  }
+
+  res.status(httpStatus.FORBIDDEN).json({
+    isAuthenticated: false,
   });
 };
 
-const logout = (req, res) => {
+const signout = (req, res) => {
   req.logout();
-  res.redirect(process.env.DOMAIN_DEV);
+  res.redirect(process.env.DOMAIN_WEB);
 };
 
 module.exports = {
-  index,
-  notifyLoginFailure,
-  logout
+  authenticate,
+  signout
 };

@@ -1,15 +1,6 @@
-require('dotenv').config();
-
-const dbConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-};
-
 const beginTransaction = con =>
   new Promise((resolve, reject) => {
-    con.beginTransaction((err) => {
+    con.beginTransaction(err => {
       if (err) {
         reject(err);
         return;
@@ -31,7 +22,7 @@ const query = (con, stmt, params) =>
 
 const commit = con =>
   new Promise((resolve, reject) => {
-    con.commit((err) => {
+    con.commit(err => {
       if (err) {
         reject(err);
         return;
@@ -48,7 +39,6 @@ const rollback = (con, err) =>
   });
 
 module.exports = {
-  dbConfig,
   beginTransaction,
   query,
   commit,
