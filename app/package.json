@@ -1,6 +1,6 @@
 {
   "name": "tokyomap-app",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": false,
   "description": "backend api for tokyomap.live",
   "author": "xyzsince2014 (https://github.com/xyzsince2014/)",
@@ -34,6 +34,6 @@
     "passport-line-auth": "^0.2.9",
     "passport-twitter": "^1.0.4",
     "redis": "^3.0.2",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.4.0"
   }
 }

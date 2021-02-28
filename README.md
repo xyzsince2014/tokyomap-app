@@ -12,7 +12,7 @@ https://github.com/xyzsince2014/tokyomap-web
 ## バージョン
 - express 4.16.1
 - passport 0.4.1
-- socket.io 2.3.0
+- socket.io 2.4.0
 
 <br>
 
