@@ -1,46 +1,29 @@
-# Abstract
-My Express.js boilerplate constructed based on Jonathan Wexler's [Get Programming with Node.js](https://www.manning.com/books/get-programming-with-node-js?query=node.js).<br>
+# アプリケーションについて
 
-Used MariaDB instead of MongoDB.
+<img alt="GitHub top language" src="https://img.shields.io/github/languages/top/xyzsince2014/tokyomap-app">
+<img alt="GitHub tag (latest by date)" src="https://img.shields.io/github/v/tag/xyzsince2014/tokyomap-app">
 
-## Structure
+## 概要
+以下のREADMEに記載<br>
+https://github.com/xyzsince2014/tokyomap-web
+
+<br>
+
+## バージョン
+- express 4.16.1
+- passport 0.4.1
+- socket.io 2.3.0
+
+<br>
+
+## 開発環境
+```bash
+cd app
+cp <環境変数ファイル> .dev.env # 環境変数設定
+yarn install
+docker-compose up -d
 ```
-├── app
-│   ├── auth
-│   ├── bin
-│   ├── controllers
-│   ├── node_modules
-│   ├── public
-│   ├── routes
-│   ├── services
-│   ├── utils
-│   ├── views
-│   ├── .env
-│   ├── app.js
-│   ├── package.json
-│   └── yarn.lock
-├── docker
-│   ├── app
-│   │   └── Dockerfile
-│   ├── db_subscriber
-│   │   ├── sql
-│   │   │   ├── init.sql
-│   │   │   └── initial_data_*.csv
-│   │   ├── var
-│   │   └── my.cnf
-│   └── web
-│       ├── default.conf
-│       └── Dockerfile
-├── node_modules
-├── clear_database.sh
-├── create_project.sh
-├── docker-compose.yml
-├── package.json
-├── README.md
-└── yarn.lock
-```
-
-## Reference
-1. [express.js](https://qiita.com/ryo-ohnishi/items/3653f7583c8591eef333)
-1. [mariadb](https://qiita.com/A-Kira/items/f401aea261693c395966)
-1. [get-programming-with-nodejs](https://github.com/JonathanWexler/get-programming-with-nodejs)
+<p>ローカルに&nbsp;`git clone`&nbsp;後, 上記のコマンドを叩くと以下のエンドポイントが動く.<br>
+https://localhost/api <br>
+https://localhost/socket.io
+</p>
