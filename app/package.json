@@ -1,12 +1,23 @@
 {
-  "name": "app",
-  "version": "0.0.1",
-  "private": true,
+  "name": "tokyomap-app",
+  "version": "2.0.1",
+  "private": false,
+  "description": "backend api for tokyomap.live",
+  "author": "xyzsince2014 (https://github.com/xyzsince2014/)",
+  "license": "UNLICENSED",
+  "man": "../README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xyzsince2014/tokyomap-app"
+  },
+  "bugs": {
+    "url": "https://github.com/xyzsince2014/tokyomap-app/issues",
+    "email": "xyzsince2014@gmail.com"
+  },
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "axios": "^0.20.0",
     "connect-redis": "^5.0.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
