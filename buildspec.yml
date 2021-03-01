@@ -1,7 +1,15 @@
 version: 0.2
 
+env:
+  secrets-manager:
+    DOCKERHUB_USER: arn:aws:secretsmanager:ap-northeast-1:914087091933:secret:dockerhub-b6OA2H:username
+    DOCKERHUB_PASS: arn:aws:secretsmanager:ap-northeast-1:914087091933:secret:dockerhub-b6OA2H:password
+
 phases:
   install:
+    commands:
+      - echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+      - yarn install
     runtime-versions:
       nodejs: 14
   build:
