@@ -23,21 +23,32 @@ const getTweets = async () => {
       return [];
     }
 
-    let tweets = [];
-    records.map(rec => {
-      tweets.push({
-        tweetId: rec.tweet_id,
-        userId: rec.user_id,
-        userName: rec.user_name,
-        profileImageUrl: /^https/.test(rec.profile_image_url) ? rec.profile_image_url : null,
-        message: rec.message,
-        postedAt: rec.posted_at,
-        disappearAt: rec.disappear_at,
-        lat: rec.lat,
-        lng: rec.lng,
-      });
-    });
-    return tweets;
+    // let tweets = [];
+    // records.map(rec => {
+    //   tweets.push({
+    //     tweetId: rec.tweet_id,
+    //     userId: rec.user_id,
+    //     userName: rec.user_name,
+    //     profileImageUrl: /^https/.test(rec.profile_image_url) ? rec.profile_image_url : null,
+    //     message: rec.message,
+    //     postedAt: rec.posted_at,
+    //     disappearAt: rec.disappear_at,
+    //     lat: rec.lat,
+    //     lng: rec.lng,
+    //   });
+    // });
+    // return tweets;
+    return records.reduce((accm, current) => accm.push({
+      tweetId: current.tweet_id,
+      userId: current.user_id,
+      userName: current.user_name,
+      profileImageUrl: /^https/.test(current.profile_image_url) ? current.profile_image_url : null,
+      message: current.message,
+      postedAt: current.posted_at,
+      disappearAt: current.disappear_at,
+      lat: current.lat,
+      lng: current.lng,
+    }), []);
   } catch (err) {
     throw err;
   }
