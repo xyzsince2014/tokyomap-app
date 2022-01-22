@@ -23,21 +23,17 @@ const getTweets = async () => {
       return [];
     }
 
-    let tweets = [];
-    records.map(rec => {
-      tweets.push({
-        tweetId: rec.tweet_id,
-        userId: rec.user_id,
-        userName: rec.user_name,
-        profileImageUrl: /^https/.test(rec.profile_image_url) ? rec.profile_image_url : null,
-        message: rec.message,
-        postedAt: rec.posted_at,
-        disappearAt: rec.disappear_at,
-        lat: rec.lat,
-        lng: rec.lng,
-      });
-    });
-    return tweets;
+    return records.map(rec => ({
+      tweetId: rec.tweet_id,
+      userId: rec.user_id,
+      userName: rec.user_name,
+      profileImageUrl: /^https/.test(rec.profile_image_url) ? rec.profile_image_url : null,
+      message: rec.message,
+      postedAt: rec.posted_at,
+      disappearAt: rec.disappear_at,
+      lat: rec.lat,
+      lng: rec.lng,
+    }));
   } catch (err) {
     throw err;
   }
