@@ -5,10 +5,10 @@ services:
       context: ./app
       args:
         NODE_ENV: development
-        DB_HOST: db
+        DB_HOST: postgres
+        DB_DATABASE: tokyomap
         DB_USER: docker
         DB_PASSWORD: docker
-        DB_DATABASE: tokyomap
         COOKIE_SECRET_KEY: hoge
         DOMAIN_API: https://localhost/api
         DOMAIN_WEB: https://localhost
@@ -20,26 +20,3 @@ services:
       - "4000:4000"
     env_file: ./app/.dev.env
     command:  [sh, -c, yarn start]
-  db:
-    image: mariadb/server
-    container_name: tokyomap-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: tokyomap
-      MYSQL_USER: docker
-      MYSQL_PASSWORD: docker
-      TZ: Asia/Tokyo
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./db/var:/var/lib/mysql
-      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./db/sql:/docker-entrypoint-initdb.d
-    ports:
-      - "3306:3306"
-  redis:
-    image: "redis:latest"
-    container_name: tokyomap-redis
-    volumes:
-      - "./redis/data:/data"
-    ports:
-      - "6379:6379"
