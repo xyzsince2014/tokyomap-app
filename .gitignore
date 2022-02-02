@@ -1,7 +1,4 @@
 **/node_modules/
-db/var/**/*
-web/public/**/*
-redis/**/*
 **/*.log
 **/.DS_Store
-**/*.env
+app/.credentials.dev.env

@@ -1,14 +1,17 @@
 const router = require("express").Router();
-const authController = require("../controllers/auth");
+const authController = require("../controllers/authController");
 
+// todo: write to config.js
 const sessionConfig = {
-  successRedirect: process.env.DOMAIN_WEB,
-  failureRedirect: 'https://www.google.com/', // todo: redirect to the error page hosted on S3
+  successRedirect: process.env.DOMAIN,
+  failureRedirect: process.env.ERROR_URI,
   session: true,
 };
 
 module.exports = passport => {
   router
+    .get("/authorise", authController.authorise)
+    .get("/callback", authController.callback)
     .get("/authenticate", authController.authenticate)
     .get("/signout", authController.signout)
     .get("/twitter", passport.authenticate("twitter"))

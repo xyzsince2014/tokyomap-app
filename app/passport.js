@@ -3,14 +3,13 @@ const TwitterStrategy = require("passport-twitter").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 const LineStrategy = require("passport-line-auth").Strategy;
 
-const mariaAuth = require("../models/auth");
+const usrLogic = require("./logics/usrLogic");
 
 const postProcessing = async (done, user) => {
   try {
-    await mariaAuth.postUser(user);
+    await usrLogic.registerUser(user);
     done(null, user);
   } catch (err) {
-    console.log(err); // todo: use CloudWatchLogs
     done(null, false, null);
   }
 };
@@ -22,7 +21,7 @@ module.exports = () => {
       {
         consumerKey: process.env.TWITTER_CONSUMER_KEY,
         consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
-        callbackURL: `${process.env.DOMAIN_API}/auth/twitter/callback`,
+        callbackURL: `${process.env.DOMAIN}/api/auth/twitter/callback`,
         includeEmail: true,
       },
       async (token, tokenSecret, profile, done) => {
@@ -43,7 +42,7 @@ module.exports = () => {
       {
         clientID: process.env.FACEBOOK_APP_ID,
         clientSecret: process.env.FACEBOOK_APP_SECRET,
-        callbackURL: `${process.env.DOMAIN_API}/auth/facebook/callback`,
+        callbackURL: `${process.env.DOMAIN}/api/auth/facebook/callback`,
       },
       async (accessToken, refreshToken, profile, done) => {
         await postProcessing(done, {
@@ -63,7 +62,7 @@ module.exports = () => {
       {
         channelID: process.env.LINE_CHANNEL_ID,
         channelSecret: process.env.LINE_CHANNEL_SECRET,
-        callbackURL: `${process.env.DOMAIN_API}/auth/line/callback`,
+        callbackURL: `${process.env.DOMAIN}/api/auth/line/callback`,
         scope: ["profile", "openid"],
         botPrompt: "normal", // what?
         uiLocales: "en-US", // todo: use en-GB
