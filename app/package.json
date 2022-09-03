@@ -21,19 +21,26 @@
     "connect-redis": "^5.0.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "express-session": "^1.17.1",
     "express-validator": "^6.6.0",
     "http-errors": "~1.6.3",
     "http-status-codes": "^1.4.0",
+    "immer": "^9.0.15",
+    "jsrsasign": "^10.5.26",
     "method-override": "^3.0.0",
     "mysql": "^2.18.1",
+    "node-fetch": "^2.6.6",
     "passport": "^0.4.1",
     "passport-facebook": "^3.0.0",
     "passport-line-auth": "^0.2.9",
     "passport-twitter": "^1.0.4",
+    "pg": "^8.7.3",
+    "randomstring": "^1.2.2",
     "redis": "^3.0.2",
-    "socket.io": "^2.4.0"
+    "socket.io": "^2.4.0",
+    "url": "^0.11.0"
   }
 }

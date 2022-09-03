@@ -7,9 +7,10 @@ const redis = require('redis');
 const RedisStore = require('connect-redis')(session);
 
 const router = require('./routes/index');
-const passport = require('./middlewares/passport')();
+const passport = require('./passport')();
 
-const redisClient = redis.createClient(6379, process.env.REDIS_ENDPOINT);
+// todo: port should be a const
+const redisClient = redis.createClient(process.env.REDID_PORT, process.env.REDIS_HOST);
 const app = express();
 
 app
@@ -19,7 +20,8 @@ app
   .use(express.json())
   .use(
     session({
-      secret: process.env.COOKIE_SECRET_KEY,
+      key: process.env.SESSION_KEY,
+      secret: process.env.SESSION_SECRETE,
       proxy: true,
       resave: false,
       saveUninitialized: false,
@@ -38,11 +40,16 @@ app
   .use(passport.session()) // enables passport.js to store auth info in the session
   .use(
     cors({
-      origin: process.env.DOMAIN_WEB,
+      origin: process.env.DOMAIN,
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       credentials: true
     })
   )
   .use("/", router(passport));
+
+// manage http headers
+app
+  .disable('x-powered-by')
+  .set('etag', false);
 
 module.exports = app;
