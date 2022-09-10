@@ -11,10 +11,34 @@ phases:
       - echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
       - yarn install
     runtime-versions:
-      nodejs: 14
+      nodejs: 16
   build:
     commands:
-      - docker build -t ${ECR_REPO}:${VERSION} --build-arg NODE_ENV="production" --build-arg DB_HOST="${DB_HOST}" --build-arg DB_USER="${DB_USER}" --build-arg DB_PASSWORD="${DB_PASSWORD}" --build-arg DB_DATABASE="${DB_DATABASE}" --build-arg COOKIE_SECRET_KEY="${COOKIE_SECRET_KEY}" --build-arg TWITTER_CONSUMER_KEY="${TWITTER_CONSUMER_KEY}" --build-arg TWITTER_CONSUMER_SECRET="${TWITTER_CONSUMER_SECRET}" --build-arg FACEBOOK_APP_ID="${FACEBOOK_APP_ID}" --build-arg FACEBOOK_APP_SECRET="${FACEBOOK_APP_SECRET}" --build-arg LINE_CHANNEL_ID="${LINE_CHANNEL_ID}" --build-arg LINE_CHANNEL_SECRET="${LINE_CHANNEL_SECRET}" --build-arg DOMAIN_API="${DOMAIN_API}" --build-arg DOMAIN_WEB="${DOMAIN_WEB}" --build-arg REDIS_ENDPOINT="${REDIS_ENDPOINT}" --build-arg PORT="${PORT}" app
+      - docker build \
+        -t ${ECR_REPO}:${VERSION} \
+        --build-arg NODE_ENV="production" \
+        --build-arg DB_HOST="${DB_HOST}" \
+        --build-arg DB_DATABASE="${DB_DATABASE}"
+        --build-arg DB_USER="${DB_USER}" \
+        --build-arg DB_PASSWORD="${DB_PASSWORD}" \
+        --build-arg DB_PORT="${DB_PORT}" \
+        --build-arg SESSION_KEY="${SESSION_KEY}" \
+        --build-arg SESSION_SECRET="${SESSION_SECRET}" \
+        --build-arg TWITTER_CONSUMER_KEY="${TWITTER_CONSUMER_KEY}" \
+        --build-arg TWITTER_CONSUMER_SECRET="${TWITTER_CONSUMER_SECRET}" \
+        --build-arg FACEBOOK_APP_ID="${FACEBOOK_APP_ID}" \
+        --build-arg FACEBOOK_APP_SECRET="${FACEBOOK_APP_SECRET}" \
+        --build-arg LINE_CHANNEL_ID="${LINE_CHANNEL_ID}" \
+        --build-arg LINE_CHANNEL_SECRET="${LINE_CHANNEL_SECRET}" \
+        --build-arg REDIS_HOST="${REDIS_HOST}" \
+        --build-arg REDIS_PORT="${REDIS_PORT}" \
+        --build-arg DOMAIN="${DOMAIN}" \
+        --build-arg PORT="${PORT}" \
+        --build-arg ERROR_URI="${ERROR_URI}" \
+        --build-arg AUTH_DOMAIN="${AUTH_DOMAIN}" \
+        --build-arg AUTH_DOMAIN_LOCALHOST="${AUTH_DOMAIN_LOCALHOST}" \
+        --build-arg RESOURCE_DOMAIN="${RESOURCE_DOMAIN}" \
+        app
   post_build:
     commands:
       - aws ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPO}
