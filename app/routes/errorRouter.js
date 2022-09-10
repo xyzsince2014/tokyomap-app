@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const errorController = require("../controllers/error");
+const errorController = require("../controllers/errorController");
 
 router
   .use(errorController.respondNotFound)
