@@ -14,7 +14,7 @@ const execute = session => {
   const hashValue = sha256Hash.digest('base64');
   const codeChallenge = base64url.fromBase64(hashValue);
 
-  return util.buildUrl(config.auth.authorisationEndpoint, {
+  return util.buildUrl(config.auth.authorisation, {
     responseType: 'AUTHORISATION_CODE',
     scopes: config.client.scopes.join(" "),
     clientId: config.client.clientId,

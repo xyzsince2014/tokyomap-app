@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const preAuthoriseService = require('../services/preAuthoriseService');
 const proAuthoriseService = require('../services/proAuthoriseService');
 
-const redisClient = redis.createClient(process.env.REDID_PORT, process.env.REDIS_HOST);
+const redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST);
 
 redisClient.on('error', error => {
   console.log('Reids error:' + error);
@@ -32,7 +32,8 @@ const callback = async (req, res) => {
   try {
     await proAuthoriseService.execute(req.query, req.session);
     res.redirect(process.env.DOMAIN);
-  } catch (e) { // todo: manage error properly
+  } catch (e) {
+    // todo: manage an error properly
     console.log(e);
     cleanUpSession(req.session);
     // res.render('error', {error: 'Unable to get tokens, server response: ' + e})
