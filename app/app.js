@@ -6,11 +6,10 @@ const cors = require("cors");
 const redis = require('redis');
 const RedisStore = require('connect-redis')(session);
 
-const router = require('./routes/index');
+const router = require('./routers/index');
 const passport = require('./passport')();
 
-// todo: port should be a const
-const redisClient = redis.createClient(process.env.REDID_PORT, process.env.REDIS_HOST);
+const redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST);
 const app = express();
 
 app

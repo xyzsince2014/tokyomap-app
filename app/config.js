@@ -7,26 +7,26 @@ const postgres = {
 };
 
 const auth = {
-  host: process.env.AUTH_DOMAIN,
-  authorisationEndpoint: `${process.env.AUTH_DOMAIN_LOCALHOST}/authorise`, // use "localhost" for communications via browsers
-  tokenEndpoint: `${process.env.AUTH_DOMAIN}/api/v1/token`,
-  publicKeysEndpoint: `${process.env.AUTH_DOMAIN}/api/v1/public-keys`,
+  host: process.env.AUTH_CONTAINER,
+  authorisation: `${process.env.DOMAIN}/auth/authorise`,
+  tokenEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/token`,
+  publicKeysEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/public-keys`,
 };
 
 const protectedResource = {
-  userInfoEndpoint: `${process.env.RESOURCE_DOMAIN}/userinfo`
+  userInfoEndpoint: `${process.env.RESOURCE_CONTAINER}/userinfo`
 };
 
 /**
  * register the client beforehand by
- * curl -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://localhost","redirectUris":["https://localhost/api/auth/callback"],"grantTypes":["AUTHORISATION_CODE","REFRESH_TOKEN"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"CLIENT_SECRET_BASIC","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'http://localhost:8080/api/v1/register' 
+ * curl -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://localhost","redirectUris":["https://localhost/api/auth/callback"],"grantTypes":["AUTHORISATION_CODE","REFRESH_TOKEN"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"CLIENT_SECRET_BASIC","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'https://localhost/auth/api/v1/register'
  * 
  * use its response as client below
  */
 const clientMetadata = {
   clientName: 'tokyomap-app',
-  clientUri: 'https://localhost',
-  redirectUris: ['https://localhost/api/auth/callback'],
+  clientUri: `${process.env.DOMAIN}`,
+  redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],
   grantTypes: ['AUTHORISATION_CODE', 'REFRESH_TOKEN'],
   responseTypes: ['CODE', 'TOKEN'],
   tokenEndpointAuthMethod: 'CLIENT_SECRET_BASIC',
@@ -35,11 +35,11 @@ const clientMetadata = {
 
 /* the client registeted */
 const client = {
-  "clientId" : "7qLexw5y",
-  "clientSecret" : "Nxztq23b",
+  "clientId" : "J8UPrig0",
+  "clientSecret" : "CLCSZECs",
   "clientName" : "tokyomap-app",
-  "clientUri" : "https://localhost",
-  "redirectUris" : [ "https://localhost/api/auth/callback" ],
+  "clientUri" : `${process.env.DOMAIN}`,
+  "redirectUris" : [`${process.env.DOMAIN}/api/auth/callback`],
   "logoUri" : null,
   "contacts" : null,
   "tosUri" : null,
@@ -47,12 +47,12 @@ const client = {
   "jwksUri" : null,
   "softwareId" : null,
   "softwareVersion" : null,
-  "grantTypes" : [ "AUTHORISATION_CODE", "REFRESH_TOKEN" ],
-  "responseTypes" : [ "CODE", "TOKEN" ],
+  "grantTypes" : ["AUTHORISATION_CODE", "REFRESH_TOKEN"],
+  "responseTypes" : ["CODE", "TOKEN"],
   "tokenEndpointAuthMethod" : "CLIENT_SECRET_BASIC",
-  "scopes" : [ "openid", "profile", "email" ],
-  "registrationAccessToken" : "VOsrY2t1",
-  "registrationClientUri" : "http://localhost:8080/api/v1/register/7qLexw5y",
+  "scopes" : ["openid", "profile", "email"],
+  "registrationAccessToken" : "dEhQSvqO",
+  "registrationClientUri" : "http://localhost:8080/api/v1/register/J8UPrig0",
 };
 
 module.exports = {
