@@ -17,6 +17,16 @@ const protectedResource = {
   userInfoEndpoint: `${process.env.RESOURCE_CONTAINER}/userinfo`
 };
 
+const clientMetadata = {
+  clientName: 'tokyomap-app',
+  clientUri: `${process.env.DOMAIN}`,
+  redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],
+  grantTypes: ['AUTHORISATION_CODE', 'REFRESH_TOKEN'],
+  responseTypes: ['CODE', 'TOKEN'],
+  tokenEndpointAuthMethod: 'CLIENT_SECRET_BASIC',
+  scopes: ['openid', 'profile', 'email']
+};
+
 /**
  * register the client beforehand by
  *
@@ -28,39 +38,6 @@ const protectedResource = {
  * 
  * use its response as client below
  */
-const clientMetadata = {
-  clientName: 'tokyomap-app',
-  clientUri: `${process.env.DOMAIN}`,
-  redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],
-  grantTypes: ['AUTHORISATION_CODE', 'REFRESH_TOKEN'],
-  responseTypes: ['CODE', 'TOKEN'],
-  tokenEndpointAuthMethod: 'CLIENT_SECRET_BASIC',
-  scopes: ['openid', 'profile', 'email']
-};
-
-/* the client registeted */
-// for prod
-// const client = {
-//   "clientId" : "nKgUAD6i",
-//   "clientSecret" : "yfpGbWNi",
-//   "clientName" : "tokyomap-app",
-//   "clientUri" : `${process.env.DOMAIN}`,
-//   "redirectUris" : [`${process.env.DOMAIN}/api/auth/callback`],
-//   "logoUri" : null,
-//   "contacts" : null,
-//   "tosUri" : null,
-//   "policyUri" : null,
-//   "jwksUri" : null,
-//   "softwareId" : null,
-//   "softwareVersion" : null,
-//   "grantTypes" : ["AUTHORISATION_CODE", "REFRESH_TOKEN"],
-//   "responseTypes" : ["CODE", "TOKEN"],
-//   "tokenEndpointAuthMethod" : "CLIENT_SECRET_BASIC",
-//   "scopes" : ["openid", "profile", "email"],
-//   "registrationAccessToken" : "ktpHS3Oz",
-//   "registrationClientUri" : "https://localhost/auth/api/v1/register/nKgUAD6i", // todo: fix domain
-// };
-
 const client = {
   "clientId" : `${process.env.CLIENT_ID}`,
   "clientSecret" : `${process.env.CLIENT_SECRET}`,
