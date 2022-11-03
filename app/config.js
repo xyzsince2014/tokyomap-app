@@ -27,17 +27,6 @@ const clientMetadata = {
   scopes: ['openid', 'profile', 'email']
 };
 
-/**
- * register the client beforehand by
- *
- * // for dev
- * curl -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://localhost","redirectUris":["https://localhost/api/auth/callback"],"grantTypes":["AUTHORISATION_CODE","REFRESH_TOKEN"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"CLIENT_SECRET_BASIC","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'https://localhost/auth/api/v1/register'
- *
- * // for prod
- * curl -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://www.tokyomap.live/","redirectUris":["https://www.tokyomap.live/api/auth/callback"],"grantTypes":["AUTHORISATION_CODE","REFRESH_TOKEN"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"CLIENT_SECRET_BASIC","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'https://www.tokyomap.live//auth/api/v1/register'
- * 
- * use its response as client below
- */
 const client = {
   "clientId" : `${process.env.CLIENT_ID}`,
   "clientSecret" : `${process.env.CLIENT_SECRET}`,

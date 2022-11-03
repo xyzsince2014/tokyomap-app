@@ -1,29 +1,22 @@
-# アプリケーションについて
+# tokyomap-app
 
 <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/xyzsince2014/tokyomap-app">
 <img alt="GitHub tag (latest by date)" src="https://img.shields.io/github/v/tag/xyzsince2014/tokyomap-app">
 
-## 概要
-以下のREADMEに記載<br>
-https://github.com/xyzsince2014/tokyomap-web
+Backend resources for https://www.tokyomap.live
 
-<br>
-
-## バージョン
-- express 4.16.1
-- passport 0.4.1
-- socket.io 2.4.0
-
-<br>
-
-## 開発環境
+## How to dev
 ```bash
-cd app
-cp <環境変数ファイル> .dev.env # 環境変数設定
+# Before build, update `client` in config.js by the return of
+curl -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://localhost","redirectUris":["https://localhost/api/auth/callback"],"grantTypes":["AUTHORISATION_CODE","REFRESH_TOKEN"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"CLIENT_SECRET_BASIC","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'https://localhost/auth/api/v1/register'
+
+# put .credentials.dev.env in /app beforehand
 yarn install
-docker-compose up -d
+./docker-build.sh
+./docker-run.sh
 ```
-<p>ローカルに&nbsp;`git clone`&nbsp;後, 上記のコマンドを叩くと以下のエンドポイントが動く.<br>
-https://localhost/api <br>
-https://localhost/socket.io
-</p>
+## For production
+```bash
+# Before build, register the client by
+curl -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://www.tokyomap.live/","redirectUris":["https://www.tokyomap.live/api/auth/callback"],"grantTypes":["AUTHORISATION_CODE","REFRESH_TOKEN"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"CLIENT_SECRET_BASIC","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'https://www.tokyomap.live//auth/api/v1/register'
+```
