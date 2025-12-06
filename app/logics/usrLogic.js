@@ -18,8 +18,8 @@ const getTweets = async () => {
       message: rec.message,
       postedAt: rec.created_at,
       disappearAt: rec.disappear_at,
-      lat: rec.lat,
-      lng: rec.lng,
+      lat: parseFloat(rec.lat),
+      lng: parseFloat(rec.lng),
     }));
 
   } catch (e) {
