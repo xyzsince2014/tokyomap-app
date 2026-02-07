@@ -5,6 +5,6 @@ docker container run -d \
   -p 80:80 \
   --rm \
   --name app \
-  --net network_dev \
+  --net network_tokyomap \
   --ip 192.168.56.100 \
   tokyomap.app:dev 

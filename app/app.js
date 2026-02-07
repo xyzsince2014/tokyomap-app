@@ -20,7 +20,7 @@ app
   .use(
     session({
       key: process.env.SESSION_KEY,
-      secret: process.env.SESSION_SECRETE,
+      secret: process.env.SESSION_SECRET,
       proxy: true,
       resave: false,
       saveUninitialized: false,
