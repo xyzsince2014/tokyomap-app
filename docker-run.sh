@@ -1,10 +1,8 @@
 #!/bin/bash
-docker container run -d \
+docker container run -d --rm \
   --env-file $(pwd)/app/dev.env \
   --env-file $(pwd)/app/.credentials.dev.env \
-  -p 80:80 \
-  --rm \
-  --name app \
+  --name tokyomap-app \
   --net network_tokyomap \
-  --ip 192.168.56.100 \
+  --ip 172.20.0.100 \
   tokyomap.app:dev 
