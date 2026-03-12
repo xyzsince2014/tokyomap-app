@@ -13,9 +13,9 @@ curl -k -i -X POST 'https://tokyomap.live/auth/api/v1/register' \
       "clientName":"tokyomap-app",
       "clientUri":"https://tokyomap.live/",
       "redirectUris":["https://tokyomap.live/api/auth/callback"],
-      "grantTypes":["AUTHORISATION_CODE","REFRESH_TOKEN"],
-      "responseTypes":["CODE","TOKEN"],
-      "tokenEndpointAuthMethod":"CLIENT_SECRET_BASIC",
+      "grantTypes":["authorization_code","refresh_token"],
+      "responseTypes":["code"],
+      "tokenEndpointAuthMethod":"client_secret_basic",
       "scopes":["openid","profile","email"]
     }
   }'

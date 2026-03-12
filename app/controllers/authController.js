@@ -4,99 +4,123 @@ const cookieParser = require("cookie-parser");
 
 const preAuthoriseService = require('../services/preAuthoriseService');
 const proAuthoriseService = require('../services/proAuthoriseService');
+const revokeService = require('../services/revokeService');
 
 const redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST);
 
 redisClient.on('error', error => {
-  console.log('Reids error:' + error);
+  console.log('[Redis Error] ' + error);
 });
 
 /**
- * redirect the user to the authorisation endpoint
+ * Redirects the user to the authorisation endpoint of the auth server.
+ *
+ * @param {*} req
+ * @param {*} res
  */
 const authorise = async (req, res) => {
   try {
     cleanUpSession(req.session);
     const url = await preAuthoriseService.execute(req.session);
     res.redirect(url);
-  } catch (e) { // todo: manage error properly
-    console.log(JSON.stringify(e));
-    // res.render('error', {error: e});
+
+  } catch (e) {
+    console.error(`[Authorise Error] ${e.message}`);
+    cleanUpSession(req.session);
+    res.redirect(`${process.env.DOMAIN}/error?error=auth_failed`);
   }
 };
 
 /**
- * fetch tokens and the userInfo from the token endpoint after authorisation
+ * Fetches tokens from the token endpoint after authorisation, verifies them, and requests the userInfo from the resoruce server.
+ *
+ * @param {*} req
+ * @param {*} res
  */
 const callback = async (req, res) => {
   try {
+    // TODO(oidc-hardening): Handle callback `error` / `error_description` parameters before token exchange and return a safe response.
     await proAuthoriseService.execute(req.query, req.session);
     res.redirect(process.env.DOMAIN);
+
   } catch (e) {
-    // todo: manage an error properly
-    console.log(e);
+    console.error(`[Callback Error] ${e.message}`);
     cleanUpSession(req.session);
-    // res.render('error', {error: 'Unable to get tokens, server response: ' + e})
+    res.redirect(`${process.env.DOMAIN}/error?error=auth_failed`);
   }
 };
 
 /**
- * execute authentication
+ * Executes authentication.
+ *
+ * @param {*} req
+ * @param {*} res
+ * @returns
  */
 const authenticate = async (req, res) => {
 
+  // Force fresh authentication check and prevent sensitive data leakage on shared devices
+  // e.g. via the "Back" button
   res.header('Cache-Control', 'no-store');
 
-  // authorised by Twitter, FB or LINE
-  if(req.isAuthenticated()) {
-    console.log(`Authorised by Twiiter, FB, or LINE`);
-    res.status(statusCodes.OK).json({userId: req.session.passport.user.userId});
-    return;
-  }
-
-  // check if authorised by auth server or not
+  // check if authorised by the AS or not
   const userInfo = req.session.userInfo;
   if(!userInfo || !userInfo.sub) {
-    console.log('Unauthtorised by sub');
     res.status(statusCodes.UNAUTHORIZED).json({userId: ''});
     return;
   }
 
-  console.log('Authtorised by sub');
   res.status(statusCodes.OK).json({userId: userInfo.sub});
-  return;
 };
 
 /**
- * sign out
+ * Signs out.
+ *
+ * @param {*} req
+ * @param {*} res
  */
 const signout = async (req, res) => {
 
-  req.logout();
+  /* clean up the AS (revoke tokens) */
+  try {
+    const {accessToken, refreshToken} = req.session;
+    if (accessToken) {
+      await revokeService.execute(accessToken, 'access_token');
+    }
+    if (refreshToken) {
+      await revokeService.execute(refreshToken, 'refresh_token');
+    }
+  } catch (e) {
+    console.error(`[Sign Out Error] ${e.message}`);
+  }
+
+  /* clenaup the RP */
   res.clearCookie(process.env.SESSION_KEY);
 
   // todo: req.session.destory()
-  await redisClient.del('sess:' + cookieParser.signedCookie(req.cookies[process.env.SESSION_KEY], process.env.SESSION_SECRET), (err, reply) => {
-    if(err) {
-      console.log(`failed to delete: ${e}`);
-    }
-  });
+  const sessionKey = cookieParser.signedCookie(req.cookies[process.env.SESSION_KEY], process.env.SESSION_SECRET);
+  if (sessionKey) {
+    await redisClient.del('sess:' + sessionKey);
+  }
 
   cleanUpSession(req.session);
   res.redirect(process.env.DOMAIN);
 };
 
 /**
- * clean up the session
+ * Cleans up the session.
+ *
+ * @param {*} session
  */
 const cleanUpSession = session => {
   session.accessToken = null;
   session.refreshToken = null;
-  session.scopes = null;
-  session.idToken = null;
-  session.state = null;
-  session.codeVerifier = null;
   session.userInfo = null;
+  session.idToken = null;
+  session.scopes = null;
+  session.state = null;
+  session.nonce = null;
+  session.codeVerifier = null;
 };
 
 module.exports = {

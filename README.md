@@ -8,7 +8,7 @@ Backend resources for https://tokyomap.live
 ## How to dev
 ```bash
 # Before build, update dev.env by the return of
-curl -k -i -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://localhost","redirectUris":["https://localhost/api/auth/callback"],"grantTypes":["AUTHORISATION_CODE","REFRESH_TOKEN"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"CLIENT_SECRET_BASIC","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'https://localhost/auth/api/v1/register'
+curl -k -i -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://localhost","redirectUris":["https://localhost/api/auth/callback"],"grantTypes":["authorization_code","refresh_token"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"client_secret_basic","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'https://localhost/auth/api/v1/register'
 
 # put .credentials.dev.env in /app beforehand
 yarn install
@@ -18,5 +18,5 @@ yarn install
 ## For production
 ```bash
 # Before build, register the client by
-curl -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://tokyomap.live/","redirectUris":["https://tokyomap.live/api/auth/callback"],"grantTypes":["AUTHORISATION_CODE","REFRESH_TOKEN"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"CLIENT_SECRET_BASIC","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'https://tokyomap.live/auth/api/v1/register'
+curl -X POST -d '{"client": {"clientName":"tokyomap-app","clientUri":"https://tokyomap.live/","redirectUris":["https://tokyomap.live/api/auth/callback"],"grantTypes":["authorization_code","refresh_token"],"responseTypes":["CODE","TOKEN"],"tokenEndpointAuthMethod":"client_secret_basic","scopes":["openid","profile","email"]}}' -H "Content-Type: application/json" -H "Accept: application/json" 'https://tokyomap.live/auth/api/v1/register'
 ```

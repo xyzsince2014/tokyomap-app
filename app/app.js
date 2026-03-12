@@ -1,5 +1,4 @@
 const express = require("express");
-const methodOverride = require("method-override");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -7,15 +6,13 @@ const redis = require('redis');
 const RedisStore = require('connect-redis')(session);
 
 const router = require('./routers/index');
-const passport = require('./passport')();
 
 const redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST);
 const app = express();
 
 app
-  .use(methodOverride("_method", { methods: ["POST", "GET"] }))
   .use(cookieParser())
-  .use(express.urlencoded({ extended: true }))
+  .use(express.urlencoded({extended: true}))
   .use(express.json())
   .use(
     session({
@@ -24,7 +21,7 @@ app
       proxy: true,
       resave: false,
       saveUninitialized: false,
-      store: new RedisStore({ client: redisClient }),
+      store: new RedisStore({client: redisClient}),
       cookie: {
         httpOnly: true,
         // todo: secure: process.env.NODE_ENV == 'production',
@@ -35,8 +32,6 @@ app
       }
     })
   )
-  .use(passport.initialize())
-  .use(passport.session()) // enables passport.js to store auth info in the session
   .use(
     cors({
       origin: process.env.DOMAIN,
@@ -44,7 +39,7 @@ app
       credentials: true
     })
   )
-  .use("/", router(passport));
+  .use("/", router());
 
 // manage http headers
 app

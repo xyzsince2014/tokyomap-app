@@ -11,6 +11,7 @@ const auth = {
   authorisation: `${process.env.DOMAIN}/auth/authorise`,
   tokenEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/token`,
   publicKeysEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/public-keys`,
+  revokeEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/revoke`,
 };
 
 const protectedResource = {
@@ -18,13 +19,16 @@ const protectedResource = {
 };
 
 const clientMetadata = {
+  // todo: to be snake case
   clientName: 'tokyomap-app',
   clientUri: `${process.env.DOMAIN}`,
   redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],
-  grantTypes: ['AUTHORISATION_CODE', 'REFRESH_TOKEN'],
-  responseTypes: ['CODE', 'TOKEN'],
-  tokenEndpointAuthMethod: 'CLIENT_SECRET_BASIC',
-  scopes: ['openid', 'profile', 'email']
+  responseTypes: ['code'], // what the callback should be given in the query params
+  grantTypes: ['authorization_code', 'refresh_token'], // in exchange of which the callback fetches tokens
+  tokenEndpointAuthMethod: 'client_secret_basic', // how the RP sends its client credentials to the token endpoint
+  scopes: ['openid', 'profile', 'email'],
+  alg: 'RS256',
+  leeway: 60 // sec
 };
 
 const client = {
@@ -40,9 +44,9 @@ const client = {
   "jwksUri" : null,
   "softwareId" : null,
   "softwareVersion" : null,
-  "grantTypes" : ["AUTHORISATION_CODE", "REFRESH_TOKEN"],
-  "responseTypes" : ["CODE", "TOKEN"],
-  "tokenEndpointAuthMethod" : "CLIENT_SECRET_BASIC",
+  "responseTypes" : ["code"],
+  "grantTypes" : ["authorization_code", "refresh_token"],
+  "tokenEndpointAuthMethod" : "client_secret_basic",
   "scopes" : ["openid", "profile", "email"],
   "registrationAccessToken" : `${process.env.REGISTRATION_ACCESS_TOKEN}`,
   "registrationClientUri" : `${process.env.REGISTRATION_CLIENT_URI}`,

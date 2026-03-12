@@ -47,20 +47,7 @@ const postTweet = async ({sub, geolocation, message}) => {
   }
 };
 
-const registerUser = async user => {
-  if (!user.userId || !user.userName) {
-    throw new Error(`${utils.fetchCurrentDatetimeJst()} [userLogic.registerUser] invalid user`);
-  }
-
-  try {
-    await usrDao.registerUser(user);
-  } catch (e) {
-    throw new Error(`${utils.fetchCurrentDatetimeJst()} [userLogic.registerUser] ${e}`);
-  }
-};
-
 module.exports = {
   getTweets,
   postTweet,
-  registerUser
 };
