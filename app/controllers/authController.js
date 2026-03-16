@@ -10,6 +10,7 @@ const redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS
 
 redisClient.on('error', error => {
   console.log('[Redis Error] ' + error);
+  res.redirect(`${process.env.DOMAIN}/error?error=redis_failed`);
 });
 
 /**
