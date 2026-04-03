@@ -8,9 +8,32 @@ pool.on('error', (err, client) => {
   throw new Error(`${util.fetchCurrentDatetimeJst()} [usrDao.pool] ${err}`);
 });
 
+/**
+ * Returns tweets.
+ *
+ * @returns tweets
+ */
 const getTweets = async () => {
   const client = await pool.connect();
-  const q = "select t.tweet_id, u.sub, u.name, u.picture, t.message, t.created_at, t.disappear_at, t.lat, t.lng from t_tweet as t join t_usr as u using(sub) where t.created_at > (now() - interval '90 minutes') order by t.created_at limit 200";
+
+  const q = `
+    select
+      tweet_id
+      , sub, message
+      , created_at
+      , disappear_at
+      , lat
+      , lng
+    from
+      t_tweet
+    where
+      created_at > (now() - interval '90 minutes')
+    order by
+      created_at desc
+    limit
+      200
+  `;
+
   try {
     const records = (await client.query(q)).rows;
     await client.release();

@@ -49,7 +49,7 @@ const fetchCurrentDatetimeJst = () =>
     })
     .replace(',', '');
 
-    /**
+/**
  * create a request body hoge=fuga&foo=boo from an object {hoge: fuga, foo: boo}
  */
 const createRequestBody = obj => Object.keys(obj).map(key => `${key}=${encodeURIComponent(obj[key])}`).join("&");

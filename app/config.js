@@ -15,7 +15,8 @@ const auth = {
 };
 
 const protectedResource = {
-  userInfoEndpoint: `${process.env.RESOURCE_CONTAINER}/userinfo`
+  userInfoEndpoint: `${process.env.RESOURCE_CONTAINER}/userinfo`,
+  profilesEndpoint: `${process.env.RESOURCE_CONTAINER}/profiles`
 };
 
 const clientMetadata = {
