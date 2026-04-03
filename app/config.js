@@ -20,14 +20,13 @@ const protectedResource = {
 };
 
 const clientMetadata = {
-  // todo: to be snake case
   clientName: 'tokyomap-app',
   clientUri: `${process.env.DOMAIN}`,
   redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],
   responseTypes: ['code'], // what the callback should be given in the query params
   grantTypes: ['authorization_code', 'refresh_token'], // in exchange of which the callback fetches tokens
   tokenEndpointAuthMethod: 'client_secret_basic', // how the RP sends its client credentials to the token endpoint
-  scopes: ['openid', 'profile', 'email'],
+  scope: ['openid', 'profile', 'email'],
   alg: 'RS256',
   leeway: 60 // sec
 };
@@ -48,7 +47,7 @@ const client = {
   "responseTypes" : ["code"],
   "grantTypes" : ["authorization_code", "refresh_token"],
   "tokenEndpointAuthMethod" : "client_secret_basic",
-  "scopes" : ["openid", "profile", "email"],
+  "scope" : ["openid", "profile", "email"],
   "registrationAccessToken" : `${process.env.REGISTRATION_ACCESS_TOKEN}`,
   "registrationClientUri" : `${process.env.REGISTRATION_CLIENT_URI}`,
 };

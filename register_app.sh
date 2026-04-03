@@ -16,6 +16,6 @@ curl -k -i -X POST 'https://tokyomap.live/auth/api/v1/register' \
       "grantTypes":["authorization_code","refresh_token"],
       "responseTypes":["code"],
       "tokenEndpointAuthMethod":"client_secret_basic",
-      "scopes":["openid","profile","email"]
+      "scope":["openid","profile","email"]
     }
   }'

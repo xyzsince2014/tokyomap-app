@@ -118,7 +118,7 @@ const cleanUpSession = session => {
   session.refreshToken = null;
   session.userInfo = null;
   session.idToken = null;
-  session.scopes = null;
+  session.scope = null;
   session.state = null;
   session.nonce = null;
   session.codeVerifier = null;

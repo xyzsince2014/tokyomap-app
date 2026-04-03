@@ -37,10 +37,10 @@ const execute = async (query, session) => {
       'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
     },
     body: util.createRequestBody({
-      grantType: config.clientMetadata.grantTypes[0],
+      grant_type: config.clientMetadata.grantTypes[0],
       code: query.code,
-      redirectUri: config.clientMetadata.redirectUris[0],
-      codeVerifier: session.codeVerifier, // PKCE
+      redirect_uri: config.clientMetadata.redirectUris[0],
+      code_verifier: session.codeVerifier, // PKCE
     }),
   });
 
@@ -53,7 +53,7 @@ const execute = async (query, session) => {
 
   session.accessToken = responseBody.accessToken;
   session.refreshToken = responseBody.refreshToken;
-  session.scopes = responseBody.scopes;
+  session.scope = responseBody.scope;
 
   // the RP is responsible for id token verification
   session.idToken = await verifyIdToken(session, responseBody.idToken);

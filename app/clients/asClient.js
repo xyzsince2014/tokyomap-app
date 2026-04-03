@@ -58,8 +58,8 @@ const getClientAccessToken = async () => {
           'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
         },
         body: new URLSearchParams({
-          'grantType': 'client_credentials', // todo: to be a constant
-          'scopes': 'profile' // todo: to be a constant
+          'grant_type': 'client_credentials', // todo: to be a constant
+          'scope': 'profile' // todo: to be a constant
         }),
         timeout: 2000 // todo: to be a constant
       },

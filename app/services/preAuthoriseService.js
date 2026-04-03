@@ -41,13 +41,13 @@ const execute = session => {
   // TODO(oidc-hardening): Validate config.client.redirectUris[0] exists and matches registered redirect_uri at the authorization server.
   // TODO(oidc-hardening): Consider adding optional OIDC parameters such as `prompt`, `max_age`, or `login_hint` for better flow control and security posture.
   return util.buildUrl(config.auth.authorisation, {
-    responseType: config.clientMetadata.responseTypes[0],
-    scopes: config.client.scopes.join(" "),
-    clientId: config.client.clientId,
-    redirectUri: config.client.redirectUris[0],
+    response_type: config.clientMetadata.responseTypes[0],
+    client_id: config.client.clientId,
+    redirect_uri: config.client.redirectUris[0],
+    code_challenge: codeChallenge,
+    scope: config.client.scope.join(" "),
     state: session.state,
-    codeChallenge,
-    codeChallengeMethod: 'S256',
+    code_challenge_method: 'S256',
     nonce: session.nonce,
   });
 };

@@ -13,6 +13,7 @@ const execute = async (token, tokenTypeHint = null) => {
   const response = await fetch(config.auth.revokeEndpoint, {
     method: 'POST',
     headers: {
+      // todo: 'Authorization': `Basic ${util.encodeClientCredentials(config.client.clientId, config.client.clientSecret)}`,
       'Authorization': `Basic ${Buffer.from(process.env.CLIENT_ID + ":" + process.env.CLIENT_SECRET).toString('base64')}`,
       'Content-Type': 'application/x-www-form-urlencoded'
     },
