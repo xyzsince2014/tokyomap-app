@@ -2,8 +2,9 @@ const fetch = require("node-fetch");
 const base64url = require('base64url');
 const jose = require("jsrsasign")
 
+const asClient = require('../clients/asClient');
+const rsClient = require('../clients/rsClient');
 const config = require('../config');
-const util = require('../utils');
 
 /**
  * Fetches tokens from the token endpoint after authorisation, and the userInfo from the resoruce server..
@@ -27,36 +28,14 @@ const execute = async (query, session) => {
   if (!query.code) {
     throw new Error('No auth code provided');
   }
+  const response = await asClient.fetchTokens(query.code, session.codeVerifier);
 
-  // request tokens from the token endpoint
-  const response = await fetch(config.as.tokenEndpoint, {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Authorization': `Basic ${util.encodeClientCredentials(config.client.clientId, config.client.clientSecret)}`,
-      'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-    },
-    body: util.createRequestBody({
-      grant_type: config.rp.grantTypes[0],
-      code: query.code,
-      redirect_uri: config.rp.redirectUris[0],
-      code_verifier: session.codeVerifier, // PKCE
-    }),
-  });
-
-  if(!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Token exchange failed: ${response.status} - ${errorBody}`);
-  }
-
-  const responseBody = await response.json();
-
-  session.accessToken = responseBody.accessToken;
-  session.refreshToken = responseBody.refreshToken;
-  session.scope = responseBody.scope;
+  session.accessToken = response.accessToken;
+  session.refreshToken = response.refreshToken;
+  session.scope = response.scope;
 
   // the RP is responsible for id token verification
-  session.idToken = await verifyIdToken(session, responseBody.idToken);
+  session.idToken = await verifyIdToken(session, response.idToken);
   if(!session.idToken) {
     throw new Error('ID Token verification failed: nonce mismatch or invalid signature');
   }
@@ -67,7 +46,7 @@ const execute = async (query, session) => {
   delete session.codeVerifier;
 
   // the userinfo endpoint returns the user info for the given ACCESS TOKEN (not ID TOKEN)
-  session.userInfo = await getUserInfo(session.accessToken);
+  session.userInfo = await rsClient.getUserInfo(session.accessToken);
   if(!session.userInfo) {
     throw new Error('failed to get userInfo');
   }
@@ -95,17 +74,8 @@ const verifyIdToken = async (session, idToken) => {
   }
 
   // request the PEM public key that matches the JWT header's kid
-  const response = await fetch(`${config.as.publicKeysEndpoint}?kid=${header.kid}`, {
-    method: 'GET',
-    headers: {'Accept': 'application/json'},
-  });
-
-  if(!response.ok) {
-    throw new Error(response.status);
-  }
-
-  // read the PEM-formatted public key from the JSON response body
-  const pemPublicKey = (await response.json()).pemPublicKey;
+  const response = await asClient.getPublicKey(header.kid);
+  const pemPublicKey = response.pemPublicKey;
 
   // verify the JWT signature using the fetched public key and declared algorithm
   if (!jose.jws.JWS.verify(idToken, pemPublicKey, header.alg)) {
@@ -151,32 +121,6 @@ const verifyIdToken = async (session, idToken) => {
   }
 
   return payload;
-};
-
-/**
- * Requests to the RS for the userInfo.
- *
- * @param {*} token access token
- * @returns userInfo
- */
-const getUserInfo = async token => {
-  try {
-    const response = await fetch(config.rs.userInfoEndpoint,{
-      method: 'GET',
-      headers: {'Authorization': `Bearer ${token}`, 'Accept': 'application/json'}
-    });
-
-    if(!response.ok) {
-      return null;
-    }
-
-    const userInfo = await response.json();
-    return userInfo;
-
-  } catch (e) {
-    console.log(e);
-    return null;
-  }
 };
 
 module.exports = {

@@ -1,25 +1,4 @@
-const url = require("url");
 
-/**
- * build a url to redirect from url, query params and hash
- */
-const buildUrl = (urlStr, queryParams, hash = null) => {
-  // todo: `url.parse` is a legacy, use `new URL` instead 
-  const urlObj = url.parse(urlStr, true); // parses the url, where query property is set to an object returned by querystring.parse()
-  delete urlObj.search;
-
-  if (!urlObj.query) {
-    urlObj.query = {};
-  }
-
-  Object.keys(queryParams).forEach(key => {
-    urlObj.query[key] = queryParams[key];
-  });
-
-  urlObj.hash = hash ?? null;
-
-  return url.format(urlObj); // returns the formatted string derived from the url object
-};
 
 /**
  * creates a buffer from the string `<clientId>:<clientSecret>`, and returns it according to base64, where clientId and clientSecret are both percent-encoded
@@ -49,15 +28,8 @@ const fetchCurrentDatetimeJst = () =>
     })
     .replace(',', '');
 
-/**
- * create a request body hoge=fuga&foo=boo from an object {hoge: fuga, foo: boo}
- */
-const createRequestBody = obj => Object.keys(obj).map(key => `${key}=${encodeURIComponent(obj[key])}`).join("&");
-
 module.exports = {
-  buildUrl,
   encodeClientCredentials,
   fetchCurrentJst,
   fetchCurrentDatetimeJst,
-  createRequestBody
 };

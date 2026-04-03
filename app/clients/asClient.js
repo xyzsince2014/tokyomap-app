@@ -3,80 +3,81 @@ const config = require('../config');
 const util = require('../utils');
 
 /**
- * Fetches profiles from RS.
+ * Fetches tokens from the AS token endpoint.
  *
- * @param {*} subs
- * @returns user profiles 
+ * @param {*} code
+ * @param {*} codeVerifier
+ * @returns
  */
-const fetchProfiles = async (subs) => {
-  try {
-    const accessToken = await getClientAccessToken();
+const fetchTokens = async (code, codeVerifier) => {
+  const body = new URLSearchParams({
+    grant_type: config.rp.grantTypes[0],
+    code,
+    redirect_uri: config.rp.redirectUris[0],
+    code_verifier: codeVerifier,
+  }).toString();
 
-    const response = await fetch(
-      config.rs.profilesEndpoint,
-      {
-        method: 'POST',
-        headers: {'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json'},
-        body: JSON.stringify({subs: Array.isArray(subs) ? subs : [subs]}),
-        timeout: 2000
-      },
-    );
+  const response = await fetch(config.as.tokenEndpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${util.encodeClientCredentials(config.client.clientId, config.client.clientSecret)}`,
+      'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+    },
+    body,
+  });
 
-    if (!response.ok) {
-      // todo
-      const errorDetail = await response.text(); 
-      console.error(`RS Error (Status ${response.status}): ${errorDetail}`);
-      throw new Error(`RS fetchProfiles failed with status ${response.status}`);
-    }
-
-    const responseBody = await response.json();
-
-    return responseBody;
-
-  } catch (e) {
-    console.error('RS fetchProfiles failed:', e.responseData || e.message);
-    throw e;
+  if (!response.ok) {
+    throw new Error(`Token exchange failed: ${response.status}`);
   }
+
+  return response.json();
 };
 
 /**
- * Fetches an access token with Client Credentials Grant.
+ * Gets the public key.
+ *
+ * @param {*} kid
+ * @returns
  */
-const getClientAccessToken = async () => {
-  // todo: use token cached in redis
-  // if (cachedToken && Date.now() < tokenExpiresAt) {
-  //   return cachedToken;
-  // }
+const getPublicKey = async (kid) => {
+  const response = await fetch(`${config.as.publicKeysEndpoint}?kid=${kid}`);
 
-  try {
-    const response = await fetch(
-      config.as.tokenEndpoint,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${util.encodeClientCredentials(config.client.clientId, config.client.clientSecret)}`,
-          'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-        },
-        body: new URLSearchParams({
-          'grant_type': 'client_credentials', // todo: to be a constant
-          'scope': 'profile' // todo: to be a constant
-        }),
-        timeout: 2000 // todo: to be a constant
-      },
-    );
+  if (!response.ok) {
+    throw new Error(`Failed to fetch JWKS: ${response.status}`);
+  }
 
-    if (!response.ok) {
-      throw new Error(`AS Token request failed with status ${response.status}`);
-    }
+  return response.json();
+};
 
-    return (await response.json()).accessToken;
+/**
+ * Revokes the given token at the AS revocation endpoint.
+ *
+ * @param {string} token
+ * @param {string|null} tokenTypeHint 'access_token' or 'refresh_token'
+ */
+const revokeToken = async (token, tokenTypeHint = null) => {
+  const params = {token};
+  if (tokenTypeHint) {
+    params.token_type_hint = tokenTypeHint;
+  }
 
-  } catch (e) {
-    console.error('AS Failed to get Client Access Token:', e.responseData || e.message);
-    throw e;
+  const response = await fetch(config.as.revokeEndpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${util.encodeClientCredentials(config.client.clientId, config.client.clientSecret)}`,
+      'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+    },
+    body: new URLSearchParams(params).toString(),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Token revocation failed: ${response.status} - ${errorBody}`);
   }
 };
 
 module.exports = {
-  fetchProfiles
+  fetchTokens,
+  getPublicKey,
+  revokeToken
 };

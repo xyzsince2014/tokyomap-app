@@ -1,5 +1,5 @@
 const usrLogic = require('../logics/usrLogic');
-const asClient = require('../clients/asClient');
+const rsClient = require('../clients/rsClient');
 
 /**
  * Executes socket connection i/o.
@@ -40,7 +40,7 @@ const execute = io => {
  * @param {*} accessToken
  * @return enriched tweets
  */
-const enrichTweets = async (tweets, acccessToken) => {
+const enrichTweets = async (tweets, accessToken) => {
   if (!tweets || tweets.length === 0) {
     return [];
   }
@@ -50,7 +50,7 @@ const enrichTweets = async (tweets, acccessToken) => {
     return tweets;
   }
 
-  const profiles = await asClient.fetchProfiles(uniqueSubs, acccessToken);
+  const profiles = await rsClient.fetchProfiles(uniqueSubs, accessToken);
   if (!profiles || Object.keys(profiles).length === 0) {
     console.log('No profiles found, returning raw tweets.');
     return tweets;
