@@ -13,7 +13,7 @@ const fetchProfiles = async (subs) => {
     const accessToken = await getClientAccessToken();
 
     const response = await fetch(
-      config.protectedResource.profilesEndpoint,
+      config.rs.profilesEndpoint,
       {
         method: 'POST',
         headers: {'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json'},
@@ -50,7 +50,7 @@ const getClientAccessToken = async () => {
 
   try {
     const response = await fetch(
-      config.auth.tokenEndpoint,
+      config.as.tokenEndpoint,
       {
         method: 'POST',
         headers: {

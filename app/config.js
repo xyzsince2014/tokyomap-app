@@ -6,7 +6,7 @@ const postgres = {
   port: process.env.DB_PORT,
 };
 
-const auth = {
+const as = {
   host: process.env.AUTH_CONTAINER,
   authorisation: `${process.env.DOMAIN}/auth/authorise`,
   tokenEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/token`,
@@ -14,12 +14,12 @@ const auth = {
   revokeEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/revoke`,
 };
 
-const protectedResource = {
+const rs = {
   userInfoEndpoint: `${process.env.RESOURCE_CONTAINER}/userinfo`,
   profilesEndpoint: `${process.env.RESOURCE_CONTAINER}/profiles`
 };
 
-const clientMetadata = {
+const rp = {
   clientName: 'tokyomap-app',
   clientUri: `${process.env.DOMAIN}`,
   redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],
@@ -54,8 +54,8 @@ const client = {
 
 module.exports = {
   postgres,
-  auth,
-  protectedResource,
-  clientMetadata,
+  as,
+  rs,
+  rp,
   client,
 };

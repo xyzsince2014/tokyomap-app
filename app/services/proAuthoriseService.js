@@ -29,7 +29,7 @@ const execute = async (query, session) => {
   }
 
   // request tokens from the token endpoint
-  const response = await fetch(config.auth.tokenEndpoint, {
+  const response = await fetch(config.as.tokenEndpoint, {
     method: 'POST',
     mode: 'cors',
     headers: {
@@ -37,9 +37,9 @@ const execute = async (query, session) => {
       'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
     },
     body: util.createRequestBody({
-      grant_type: config.clientMetadata.grantTypes[0],
+      grant_type: config.rp.grantTypes[0],
       code: query.code,
-      redirect_uri: config.clientMetadata.redirectUris[0],
+      redirect_uri: config.rp.redirectUris[0],
       code_verifier: session.codeVerifier, // PKCE
     }),
   });
@@ -90,12 +90,12 @@ const verifyIdToken = async (session, idToken) => {
   const header = JSON.parse(base64url.decode(idTokenSplit[0]));
 
   // check `alg` to prevent none algorithm attack
-  if (header.alg !== config.clientMetadata.alg) {
-    throw new Error(`Invalid algorithm: ${header.alg}. Expected ${config.clientMetadata.alg}`);
+  if (header.alg !== config.rp.alg) {
+    throw new Error(`Invalid algorithm: ${header.alg}. Expected ${config.rp.alg}`);
   }
 
   // request the PEM public key that matches the JWT header's kid
-  const response = await fetch(`${config.auth.publicKeysEndpoint}?kid=${header.kid}`, {
+  const response = await fetch(`${config.as.publicKeysEndpoint}?kid=${header.kid}`, {
     method: 'GET',
     headers: {'Accept': 'application/json'},
   });
@@ -116,8 +116,8 @@ const verifyIdToken = async (session, idToken) => {
   const payload = JSON.parse(base64url.decode(idTokenSplit[1]));
 
   // make sure the token issuer identifies with the URI of the auth server
-  if (payload.iss !== config.auth.host) {
-    throw new Error(`payload.iss is expected to be ${config.auth.host}, but ${payload.iss}`);
+  if (payload.iss !== config.as.host) {
+    throw new Error(`payload.iss is expected to be ${config.as.host}, but ${payload.iss}`);
   }
 
   // `aud` must contain or equals to the RP's cliend id
@@ -127,7 +127,7 @@ const verifyIdToken = async (session, idToken) => {
   }
 
   const now = Math.floor(Date.now() / 1000);
-  const leeway = config.clientMetadata.leeway;
+  const leeway = config.rp.leeway;
 
   // check `exp`
   if (payload.exp < (now - leeway)) {
@@ -161,7 +161,7 @@ const verifyIdToken = async (session, idToken) => {
  */
 const getUserInfo = async token => {
   try {
-    const response = await fetch(config.protectedResource.userInfoEndpoint,{
+    const response = await fetch(config.rs.userInfoEndpoint,{
       method: 'GET',
       headers: {'Authorization': `Bearer ${token}`, 'Accept': 'application/json'}
     });

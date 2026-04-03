@@ -40,8 +40,8 @@ const execute = session => {
 
   // TODO(oidc-hardening): Validate config.client.redirectUris[0] exists and matches registered redirect_uri at the authorization server.
   // TODO(oidc-hardening): Consider adding optional OIDC parameters such as `prompt`, `max_age`, or `login_hint` for better flow control and security posture.
-  return util.buildUrl(config.auth.authorisation, {
-    response_type: config.clientMetadata.responseTypes[0],
+  return util.buildUrl(config.as.authorisation, {
+    response_type: config.rp.responseTypes[0],
     client_id: config.client.clientId,
     redirect_uri: config.client.redirectUris[0],
     code_challenge: codeChallenge,

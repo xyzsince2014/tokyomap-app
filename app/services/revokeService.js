@@ -10,7 +10,7 @@ const util = require('../utils');
  */
 const execute = async (token, tokenTypeHint = null) => {
 
-  const response = await fetch(config.auth.revokeEndpoint, {
+  const response = await fetch(config.as.revokeEndpoint, {
     method: 'POST',
     headers: {
       // todo: 'Authorization': `Basic ${util.encodeClientCredentials(config.client.clientId, config.client.clientSecret)}`,
