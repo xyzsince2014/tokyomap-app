@@ -37,10 +37,9 @@ const execute = io => {
  * Enriches tweets with profiles fetched from RS.
  *
  * @param {*} tweets
- * @param {*} accessToken
  * @return enriched tweets
  */
-const enrichTweets = async (tweets, accessToken) => {
+const enrichTweets = async (tweets) => {
   if (!tweets || tweets.length === 0) {
     return [];
   }
@@ -50,7 +49,7 @@ const enrichTweets = async (tweets, accessToken) => {
     return tweets;
   }
 
-  const profiles = await rsClient.fetchProfiles(uniqueSubs, accessToken);
+  const profiles = await rsClient.fetchProfiles(uniqueSubs);
   if (!profiles || Object.keys(profiles).length === 0) {
     console.log('No profiles found, returning raw tweets.');
     return tweets;
