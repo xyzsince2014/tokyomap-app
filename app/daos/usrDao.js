@@ -1,11 +1,12 @@
 const pg = require('pg'); // todo: use Sequelize.js
 
 const config = require('../config');
+const utils = require('../utils');
 
 const pool = new pg.Pool(config.postgres);
 
 pool.on('error', (err, client) => {
-  throw new Error(`${util.fetchCurrentDatetimeJst()} [usrDao.pool] ${err}`);
+  throw new Error(`${utils.fetchCurrentDatetimeJst()} [usrDao.pool] ${err}`);
 });
 
 /**
