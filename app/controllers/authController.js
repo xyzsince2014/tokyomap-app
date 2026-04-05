@@ -1,3 +1,4 @@
+const { promisify } = require('util');
 const statusCodes = require("http-status-codes");
 const redis = require('redis');
 const cookieParser = require("cookie-parser");
@@ -7,6 +8,7 @@ const proAuthoriseService = require('../services/proAuthoriseService');
 const revokeService = require('../services/revokeService');
 
 const redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST);
+const redisDelAsync = promisify(redisClient.del).bind(redisClient);
 
 redisClient.on('error', error => {
   console.log('[Redis Error] ' + error);
@@ -98,10 +100,10 @@ const signout = async (req, res) => {
   /* clenaup the RP */
   res.clearCookie(process.env.SESSION_KEY);
 
-  // todo: req.session.destory()
+  // todo: req.session.destroy()
   const sessionKey = cookieParser.signedCookie(req.cookies[process.env.SESSION_KEY], process.env.SESSION_SECRET);
   if (sessionKey) {
-    await redisClient.del('sess:' + sessionKey);
+    await redisDelAsync('sess:' + sessionKey);
   }
 
   cleanUpSession(req.session);
