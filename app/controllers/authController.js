@@ -8,12 +8,8 @@ const proAuthoriseService = require('../services/proAuthoriseService');
 const revokeService = require('../services/revokeService');
 
 const redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST);
+redisClient.on('error', (err) => console.error('[Redis Error] ', err));
 const redisDelAsync = promisify(redisClient.del).bind(redisClient);
-
-redisClient.on('error', error => {
-  console.log('[Redis Error] ' + error);
-  res.redirect(`${process.env.DOMAIN}/error?error=redis_failed`);
-});
 
 /**
  * Redirects the user to the authorisation endpoint of the auth server.

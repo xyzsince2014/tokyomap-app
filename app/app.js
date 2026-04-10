@@ -7,7 +7,12 @@ const RedisStore = require('connect-redis')(session);
 
 const router = require('./routers/index');
 
-const redisClient = redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST);
+const redisClient = redis.createClient({
+  post: process.env.REDIS_PORT,
+  host: process.env.REDIS_HOST
+});
+redisClient.on('error', (err) => console.error('[Redis Error] ', err));
+
 const app = express();
 
 app

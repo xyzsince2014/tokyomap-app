@@ -1,4 +1,7 @@
 **/node_modules/
 **/*.log
 **/.DS_Store
-app/.credentials.dev.env
+postgres/hgsql/
+postgres/var/
+
+redis/data/

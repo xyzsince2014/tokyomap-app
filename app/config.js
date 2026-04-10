@@ -7,16 +7,16 @@ const postgres = {
 };
 
 const as = {
-  host: process.env.AUTH_CONTAINER,
-  authorisation: `${process.env.DOMAIN}/auth/authorise`,
-  tokenEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/token`,
-  publicKeysEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/public-keys`,
-  revokeEndpoint: `${process.env.AUTH_CONTAINER}/api/v1/revoke`,
+  host: process.env.AS_DOMAIN,
+  authorisation: `${process.env.AS_DOMAIN}/authorise`,
+  tokenEndpoint: `${process.env.AS_DOMAIN}/api/v1/token`,
+  publicKeysEndpoint: `${process.env.AS_DOMAIN}/api/v1/public-keys`,
+  revokeEndpoint: `${process.env.AS_DOMAIN}/api/v1/revoke`,
 };
 
 const rs = {
-  userInfoEndpoint: `${process.env.RESOURCE_CONTAINER}/userinfo`,
-  profilesEndpoint: `${process.env.RESOURCE_CONTAINER}/profiles`
+  userInfoEndpoint: `${process.env.RS_DOMAIN}/userinfo`,
+  profilesEndpoint: `${process.env.RS_DOMAIN}/profiles`
 };
 
 const rp = {
