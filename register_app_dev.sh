@@ -5,7 +5,7 @@
 # register the application via the auth server's client registation endpoint (dev)
 # update dev.env by the returned values before build
 # cf. RFC 7591
-curl -k -i -X POST 'https://as.localhost/api/v1/register' \
+curl -k -i -X POST 'https://tallyme-idp.localhost/api/v1/register' \
   -u admin:password \
   -H "Content-Type: application/x-www-form-urlencoded" \
   --data-urlencode "client_name=tokyomap-app" \
