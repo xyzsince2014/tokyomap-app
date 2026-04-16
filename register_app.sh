@@ -6,7 +6,7 @@
 curl -k -i -X POST 'https://tokyomap.live/auth/api/v1/register' \
   -u <user>:<password> \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  --data-urlencode "client_name=tokyomap-app" \
+  --data-urlencode "client_name=tokyomap-bff" \
   --data-urlencode "client_uri=https://tokyomap.live" \
   --data-urlencode "scope=openid profile email" \
   --data-urlencode "redirect_uris=https://tokyomap.live/api/auth/callback" \

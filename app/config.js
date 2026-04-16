@@ -20,7 +20,7 @@ const rs = {
 };
 
 const rp = {
-  clientName: 'tokyomap-app',
+  clientName: 'tokyomap-bff',
   clientUri: `${process.env.DOMAIN}`,
   redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],
   responseTypes: ['code'], // what the callback should be given in the query params
@@ -34,7 +34,7 @@ const rp = {
 const client = {
   "clientId" : `${process.env.CLIENT_ID}`,
   "clientSecret" : `${process.env.CLIENT_SECRET}`,
-  "clientName" : "tokyomap-app",
+  "clientName" : "tokyomap-bff",
   "clientUri" : `${process.env.DOMAIN}`,
   "redirectUris" : [`${process.env.DOMAIN}/api/auth/callback`],
   "logoUri" : null,

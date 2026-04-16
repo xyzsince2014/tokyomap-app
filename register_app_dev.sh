@@ -8,7 +8,7 @@
 curl -k -i -X POST 'https://tallyme-idp.localhost/api/v1/register' \
   -u admin:password \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  --data-urlencode "client_name=tokyomap-app" \
+  --data-urlencode "client_name=tokyomap-bff" \
   --data-urlencode "client_uri=http://localhost:3000" \
   --data-urlencode "scope=openid profile email" \
   --data-urlencode "redirect_uris=http://localhost:3000/api/auth/callback" \
