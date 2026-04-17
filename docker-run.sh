@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# doker run for dev
+
 # postgres
 docker run -d --rm \
   --name tokyomap-postgres \
