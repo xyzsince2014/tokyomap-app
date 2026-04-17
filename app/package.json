@@ -1,21 +1,22 @@
 {
-  "name": "tokyomap-app",
-  "version": "2.0.3",
+  "name": "tokyomap-bff",
+  "version": "3.0.0",
   "private": false,
-  "description": "backend api for tokyomap.live",
+  "description": "BFF for tokyomap.live",
   "author": "xyzsince2014 (https://github.com/xyzsince2014/)",
   "license": "UNLICENSED",
   "man": "../README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/xyzsince2014/tokyomap-app"
+    "url": "https://github.com/xyzsince2014/tokyomap-bff"
   },
   "bugs": {
-    "url": "https://github.com/xyzsince2014/tokyomap-app/issues",
+    "url": "https://github.com/xyzsince2014/tokyomap-bff/issues",
     "email": "xyzsince2014@gmail.com"
   },
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node -r dotenv/config ./bin/www dotenv_config_path=./dev.env",
+    "start:prod": "node ./bin/www"
   },
   "dependencies": {
     "connect-redis": "^5.0.0",
@@ -23,6 +24,7 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "debug": "~2.6.9",
+    "dotenv": "^17.4.1",
     "express": "~4.16.1",
     "express-session": "^1.17.1",
     "express-validator": "^6.6.0",
@@ -30,13 +32,10 @@
     "http-status-codes": "^1.4.0",
     "immer": "^9.0.15",
     "jsrsasign": "^10.5.26",
-    "method-override": "^3.0.0",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.6",
     "passport": "^0.4.1",
-    "passport-facebook": "^3.0.0",
     "passport-line-auth": "^0.2.9",
-    "passport-twitter": "^1.0.4",
     "pg": "^8.7.3",
     "randomstring": "^1.2.2",
     "redis": "^3.0.2",
