@@ -48,7 +48,7 @@ const fetchProfiles = async (subs) => {
         method: 'POST',
         headers: {'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json'},
         body: JSON.stringify({subs: Array.isArray(subs) ? subs : [subs]}),
-        timeout: 2000
+        timeout: 10000 // todo: to be a constant
       },
     );
 
@@ -91,7 +91,7 @@ const getClientAccessToken = async () => {
           'grant_type': 'client_credentials', // todo: to be a constant
           'scope': 'profile' // todo: to be a constant
         }),
-        timeout: 2000 // todo: to be a constant
+        timeout: 10000 // todo: to be a constant
       },
     );
 
