@@ -15,8 +15,7 @@
     "email": "xyzsince2014@gmail.com"
   },
   "scripts": {
-    "start": "node -r dotenv/config ./bin/www dotenv_config_path=./dev.env",
-    "start:prod": "node ./bin/www"
+    "start": "node -r dotenv/config ./bin/www dotenv_config_path=./dev.env"
   },
   "dependencies": {
     "connect-redis": "^5.0.0",
