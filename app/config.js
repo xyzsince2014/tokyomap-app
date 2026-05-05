@@ -1,3 +1,4 @@
+/* DB */
 const postgres = {
   host: process.env.DB_HOST,
   database: process.env.DB_DATABASE,
@@ -6,6 +7,7 @@ const postgres = {
   port: process.env.DB_PORT,
 };
 
+/* tallyme */
 const as = {
   host: process.env.IDP_DOMAIN,
   authorisation: `${process.env.IDP_DOMAIN}/authorise`,
@@ -52,10 +54,24 @@ const client = {
   "registrationClientUri" : `${process.env.REGISTRATION_CLIENT_URI}`,
 };
 
+/* Cognito */
+const cognito = {
+  authorisation: `${process.env.COGNITO_DOMAIN}/oauth2/authorize`,
+  tokenEndpoint: `${process.env.COGNITO_DOMAIN}/oauth2/token`,
+  publicKeysEndpoint: `https://cognito-idp.${process.env.AWS_REGION}.amazonaws.com/${process.env.COGNITO_USER_POOL_ID}/.well-known/jwks.json`,
+  clientId: process.env.COGNITO_CLIENT_ID,
+  clientSecret: process.env.COGNITO_CLIENT_SECRET,
+  redirectUri: `${process.env.DOMAIN}/api/cognito/callback`,
+  issuer: `https://cognito-idp.${process.env.AWS_REGION}.amazonaws.com/${process.env.COGNITO_USER_POOL_ID}`,
+  scope: ['openid', 'profile', 'email'],
+  responseTypes: ['code'],
+};
+
 module.exports = {
   postgres,
   as,
   rs,
   rp,
   client,
+  cognito
 };
