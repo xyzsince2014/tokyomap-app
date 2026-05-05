@@ -2,116 +2,74 @@ const fetch = require("node-fetch");
 const base64url = require('base64url');
 const jose = require("jsrsasign")
 
+const oidcService = require("./oidcService");
+const asClient = require('../clients/asClient');
+const rsClient = require('../clients/rsClient');
 const config = require('../config');
-const util = require('../utils');
 
+/**
+ * Fetches tokens from the token endpoint after authorisation, and the userInfo from the resoruce server..
+ *
+ * @param {*} query
+ * @param {*} session
+ */
 const execute = async (query, session) => {
+  // an error on the AS
+  if (query.error) {
+    throw new Error(`AS Error: ${query.error} - ${query.error_description || ''}`);
+  }
 
-  // todo: // res.render('error', {error: 'State value did not match'});
-  if (query.state !== session.state) {
-    console.log(`query.state = ${query.state}, session.state = ${session.state}`);
+  // check state to prevent code injection
+  if (!session.state || query.state !== session.state) {
+    console.log(`State mismatch: query.state = ${query.state}, session.state = ${session.state}`);
 		throw new Error('Invalid state');
 	}
 
-  const response = await fetch(config.auth.tokenEndpoint, {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Authorization': `Basic ${util.encodeClientCredentials(config.client.clientId, config.client.clientSecret)}`,
-      'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-    },
-    body: util.createRequestBody({
-      grantType: config.clientMetadata.grantTypes[0],
-      code: query.code,
-      redirectUri: config.clientMetadata.redirectUris[0],
-      codeVerifier: session.codeVerifier,
-    }),
+  // make sure code exists in the query params
+  if (!query.code) {
+    throw new Error('No auth code provided');
+  }
+  const response = await asClient.fetchTokens(query.code, session.codeVerifier);
+
+  session.accessToken = response.accessToken;
+  session.refreshToken = response.refreshToken;
+  session.scope = response.scope;
+
+  // the RP is responsible for id token verification
+  session.idToken = await oidcService.verifyIdToken({
+    idToken: response.idToken,
+    expectedIss: config.as.host,
+    expectedAud: config.client.clientId,
+    expectedNonce: session.nonce,
+    expectedAlg: config.rp.alg,
+    getPublicKeyFn
   });
 
-  if(!response.ok) {
-    throw new Error(response.status);
-  }
-
-  const responseBody = await response.json();
-
-  session.accessToken = responseBody.accessToken;
-  session.refreshToken = responseBody.refreshToken;
-  session.scopes = responseBody.scopes;
-
-  session.idToken = await verifyIdToken(session, responseBody.idToken);
   if(!session.idToken) {
-    throw new Error('invalid idToken');
+    throw new Error('ID Token verification failed: nonce mismatch or invalid signature');
   }
 
-  session.userInfo = await getUserInfo(session.accessToken);
+  // state, nonce, codeVefifier are single-use
+  delete session.state;
+  delete session.nonce;
+  delete session.codeVerifier;
+
+  // the userinfo endpoint returns the user info for the given ACCESS TOKEN (not ID TOKEN)
+  session.userInfo = await rsClient.getUserInfo(session.accessToken);
   if(!session.userInfo) {
     throw new Error('failed to get userInfo');
   }
 };
 
-const verifyIdToken = async (session, idToken) => {
-  const idTokenSplit = idToken.split('.');
-
-  const header = JSON.parse(base64url.decode(idTokenSplit[0]));
-  const response = await fetch(`${config.auth.publicKeysEndpoint}?kid=${header.kid}`, {
-    method: 'GET',
-    headers: {'Accept': 'application/json'},
-  });
-
-  if(!response.ok) {
-    throw new Error(response.status);
-  }
-
-  const pemPublicKey = (await response.json()).pemPublicKey;
-
-  if (!jose.jws.JWS.verify(idToken, pemPublicKey, header.alg)) {
-    throw new Error('invalid ID token signature');
-  }
-
-  const payload = JSON.parse(base64url.decode(idTokenSplit[1]));
-
-  if (payload.iss !== config.auth.host) {
-    throw new Error(`payload.iss is expected to be ${config.auth.host}, but ${payload.iss}`);
-  }
-
-  if ((!Array.isArray(payload.aud) || !payload.aud.includes(config.client.clientId)) && payload.aud !== config.client.clientId) {
-    throw new Error(`payload.aud is invalid`);
-  }
-  const now = Math.floor(Date.now() / 1000);
-  if (payload.exp < now || now < payload.iat) {
-    throw new Error('payload.exp is invalid');
-  }
-  if (payload.nonce !== session.nonce) {
-    session.nonce = null;
-    throw new Error('payload.nonce is invalid');
-  }
-
-  session.nonce = null;
-
-  return payload;
-};
-
 /**
- * request userInfo with accessToken
+ * Fetches the public key from tallyme-iap.
+ *
+ * @param {*} kid 
+ * @returns 
  */
-const getUserInfo = async token => {
-  try {
-    const response = await fetch(config.protectedResource.userInfoEndpoint,{
-      method: 'GET',
-      headers: {'Authorization': `Bearer ${token}`, 'Accept': 'application/json'}
-    });
-
-    if(!response.ok) {
-      return null;
-    }
-
-    const userInfo = await response.json();
-    return userInfo;
-
-  } catch (e) {
-    console.log(e);
-    return null;
-  }
+const getPublicKeyFn = async (kid) => {
+  const res = await asClient.getPublicKey(kid);
+  return res.pemPublicKey;
 };
 
 module.exports = {
