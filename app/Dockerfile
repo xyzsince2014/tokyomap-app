@@ -3,7 +3,7 @@ LABEL maintainer="xyzsince2014 <xyzsince2014@gmail.com>"
 
 WORKDIR /app
 
-COPY /app/package*.json ./
+COPY package*.json ./
 RUN npm install --production
 
 EXPOSE 8080
