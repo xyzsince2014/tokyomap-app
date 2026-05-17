@@ -18,6 +18,7 @@
     "start": "node -r dotenv/config ./bin/www dotenv_config_path=./dev.env"
   },
   "dependencies": {
+    "base64url": "^3.0.1",
     "connect-redis": "^5.0.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
