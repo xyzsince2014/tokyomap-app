@@ -7,3 +7,4 @@ postgres/var/
 redis/data/
 
 app/dev.env
+app/secrets/

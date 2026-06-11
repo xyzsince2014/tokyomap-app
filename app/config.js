@@ -14,6 +14,8 @@ const as = {
   tokenEndpoint: `${process.env.IDP_DOMAIN}/api/v1/token`,
   publicKeysEndpoint: `${process.env.IDP_DOMAIN}/api/v1/public-keys`,
   revokeEndpoint: `${process.env.IDP_DOMAIN}/api/v1/revoke`,
+  // RFC 7523 §2.2: fixed identifier declaring client_assertion is a JWT Bearer assertion
+  clientAssertionType: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
 };
 
 const rs = {
@@ -27,7 +29,7 @@ const rp = {
   redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],
   responseTypes: ['code'], // what the callback should be given in the query params
   grantTypes: ['authorization_code', 'refresh_token'], // in exchange of which the callback fetches tokens
-  tokenEndpointAuthMethod: 'client_secret_basic', // how the RP sends its client credentials to the token endpoint
+  tokenEndpointAuthMethod: 'private_key_jwt', // how the RP authenticates to the token endpoint (signed JWT, RFC 7523)
   scope: ['openid', 'profile', 'email'],
   alg: 'RS256',
   leeway: 60 // sec
@@ -48,10 +50,12 @@ const client = {
   "softwareVersion" : null,
   "responseTypes" : ["code"],
   "grantTypes" : ["authorization_code", "refresh_token"],
-  "tokenEndpointAuthMethod" : "client_secret_basic",
+  "tokenEndpointAuthMethod" : "private_key_jwt",
   "scope" : ["openid", "profile", "email"],
   "registrationAccessToken" : `${process.env.REGISTRATION_ACCESS_TOKEN}`,
   "registrationClientUri" : `${process.env.REGISTRATION_CLIENT_URI}`,
+  // path to the PEM issued by tallyme-admin, used to sign the private_key_jwt client_assertion
+  "privateKeyPath" : `${process.env.CLIENT_PRIVATE_KEY_PATH}`,
 };
 
 /* Cognito */
