@@ -1,6 +1,11 @@
+const fs = require('fs'); // JS file system
 const crypto = require('crypto');
 const base64url = require('base64url');
 const jose = require("jsrsasign");
+const { KJUR, KEYUTIL } = require('jsrsasign'); // JS library used for reading RSA key, signing JWT
+const randomstring = require('randomstring');
+
+const config = require('../config');
 
 /**
  * Generates Auth parameters.
@@ -27,11 +32,103 @@ const generateAuthParams = () => {
   // Use irreversible SHA256
   // digest('base64url') ensures the hash is URL-safe for the auth request
   const codeChallenge = crypto
-    .createHash('sha256') // todo: use config
+    .createHash('sha256')
     .update(codeVerifier)
     .digest('base64url');
 
   return {state, nonce, codeVerifier, codeChallenge};
+};
+
+/**
+ * Builds a private_key_jwt client assertion: a JWT (containing iss, sub, aud, etc.) signed with the RP's RSA private key.
+ * The IdP verifies it against the public key registered as the client's jwks (RFC 7523).
+ *
+ * @returns {string} signed client_assertion JWT
+ */
+const buildClientAssertion = () => {
+  // read privateKeyPEM and parse it into a key object jsrsasign can sign with
+  const privateKeyPem = fs.readFileSync(config.client.privateKeyPath, 'utf8');
+  const privateKey = KEYUTIL.getKey(privateKeyPem); // KEYUTIL converts PEM string to key object
+
+  // current time in epoch seconds, used for iat and exp
+  const now = KJUR.jws.IntDate.get('now'); // KJUR is util for signature generation, etc.
+
+  // JWS header: RS256 (SHA-256 with RSA private key)
+  const header = {alg: 'RS256', typ: 'JWT'};
+
+  const payload = {
+    iss: config.client.clientId, // issuer: the client authenticating itself
+    sub: config.client.clientId, // subject: identifies the client to the IdP
+    aud: config.as.tokenEndpoint, // audience: the intended recipient (the token endpoint)
+    jti: randomstring.generate(32), // unique token id, let the IdP reject replays
+    iat: now, // issued at
+    exp: now + config.as.clientAssertionLifetimeSec, // short expiry to limit the replay window
+  };
+
+  // a signed JWT consisting of sign header + payload with the private key
+  const clientAssertion = KJUR.jws.JWS.sign('RS256', JSON.stringify(header), JSON.stringify(payload), privateKey);
+
+  return clientAssertion;
+};
+
+/**
+ * Generates a pair of DPoP keys.
+ *
+ * @returns DPoP key pair
+ */
+const generateDpopKeyPair = () => {
+  // NIST P-256
+  const {prvKeyObj, pubKeyObj} = jose.KEYUTIL.generateKeypair('EC', 'secp256r1');
+
+  // serialise the private key to a PEM, which will be stored in Redis
+  // PKCS8PRV is a PKCS#8 private key format
+  const privateKeyPem = jose.KEYUTIL.getPEM(prvKeyObj, 'PKCS8PRV');
+
+  // convert the public key to a JWK: {kty:'EC', crv:'P-256', x:'yUCS…', y:'N8xh…'}
+  const publicJwk = jose.KEYUTIL.getJWKFromKey(pubKeyObj);
+
+  return {privateKeyPem, publicJwk};
+};
+
+/**
+ * Builds a DPoP proof JWT (RFC 9449): a short-lived JWT, signed with the session's DPoP private key, which proves possession of that key for a single HTTP request.
+ *
+ * @param {Object} params
+ * @param {string} params.privateKeyPem the session's DPoP EC private key (PKCS#8 PEM); signs the proof (ES256)
+ * @param {Object} params.publicJwk the matching public key as a JWK ({kty, crv, x, y}); embedded in the header
+ * @param {string} params.htm HTTP method of the target request, bound as the `htm` claim: e.g. 'POST', 'GET'
+ * @param {string} params.htu target HTTP URI without query/fragment (e.g. the token or userinfo endpoint), bound as the `htu` claim
+ * @param {string|null} [params.accessToken=null] its base64url(SHA-256) hash is added as the `ath` claim to bind the proof to that access token
+ * @returns {string} the signed DPoP proof JWT
+ */
+const buildDpopProof = ({privateKeyPem, publicJwk, htm, htu, accessToken = null}) => {
+
+  // read privateKeyPEM and parse it into a key object jsrsasign can sign with
+  const privateKey = KEYUTIL.getKey(privateKeyPem);
+
+  // current time in epoch seconds
+  const now = KJUR.jws.IntDate.get('now');
+
+  // JWS header: ES256
+  const header = {typ: 'dpop+jwt', alg: 'ES256', jwk: publicJwk};
+
+  const payload = {
+    jti: randomstring.generate(32), // unique token id, let the IdP reject replays
+    htm,
+    htu,
+    iat: now, // issued at
+  };
+
+  if (accessToken) {
+    // Use irreversible SHA256
+    // digest('base64url') ensures the hash is URL-safe for the auth request
+    payload.ath = crypto.createHash('sha256').update(accessToken).digest('base64url');
+  }
+
+  // sign the JWT with the private key
+  const dpopProof = KJUR.jws.JWS.sign('ES256', JSON.stringify(header), JSON.stringify(payload), privateKey);
+
+  return dpopProof;
 };
 
 /**
@@ -112,5 +209,8 @@ const verifyIdToken = async ({
 
 module.exports = {
   generateAuthParams,
+  buildClientAssertion,
+  generateDpopKeyPair,
+  buildDpopProof,
   verifyIdToken
 };
