@@ -25,7 +25,7 @@ const fetchTokens = async (code, codeVerifier, dpop) => {
 
   const response = await fetch(config.as.tokenEndpoint, {
     method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8', 'DPoP': dpopProof},
+    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'DPoP': dpopProof},
     body,
   });
 
