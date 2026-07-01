@@ -25,11 +25,16 @@ const execute = async (query, session) => {
 		throw new Error('Invalid state');
 	}
 
+  // RFC9207 verify the issuer to prevent mix-up attacks
+  if (query.iss !== config.as.host) {
+    throw new Error('Invalid issuer');
+  }
+
   // make sure code exists in the query params
   if (!query.code) {
     throw new Error('No auth code provided');
   }
-  const response = await asClient.fetchTokens(query.code, session.codeVerifier);
+  const response = await asClient.fetchTokens(query.code, session.codeVerifier, session.dpop);
 
   session.accessToken = response.accessToken;
   session.refreshToken = response.refreshToken;
@@ -55,7 +60,7 @@ const execute = async (query, session) => {
   delete session.codeVerifier;
 
   // the userinfo endpoint returns the user info for the given ACCESS TOKEN (not ID TOKEN)
-  session.userInfo = await rsClient.getUserInfo(session.accessToken);
+  session.userInfo = await rsClient.getUserInfo(session.accessToken, session.dpop);
   if(!session.userInfo) {
     throw new Error('failed to get userInfo');
   }

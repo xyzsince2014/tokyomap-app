@@ -1,21 +1,26 @@
 const fetch = require("node-fetch");
 
+const oidcService = require('../services/oidcService');
 const config = require('../config');
 const util = require('../utils');
 
 /**
  * Requests to the RS for the userInfo.
  *
- * @param {*} token access token
+ * @param {*} accessToken
+ * @param {*} dpop
  * @returns userInfo
  */
-const getUserInfo = async token => {
+const getUserInfo = async (accessToken, dpop) => {
+
+  const dpopProof = oidcService.buildDpopProof({...dpop, htm: 'GET', htu: config.rs.userInfoEndpoint, accessToken});
+
   try {
     const response = await fetch(
       config.rs.userInfoEndpoint,
       {
         method: 'GET',
-        headers: {'Authorization': `Bearer ${token}`, 'Accept': 'application/json'}
+        headers: {'Authorization': `DPoP ${accessToken}`, 'DPoP': dpopProof, 'Accept': 'application/json'}
       }
     );
 

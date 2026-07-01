@@ -7,14 +7,17 @@ const config = require('../config');
  * Redirects the user to the authrozation endpoint of the auth server for authorization.
  *
  * @param {*} session
- * @returns
+ * @returns AS url with parmas
  */
 const execute = session => {
+
   const {state, nonce, codeVerifier, codeChallenge} = oidcService.generateAuthParams();
+  const {privateKeyPem, publicJwk} = oidcService.generateDpopKeyPair();
 
   session.state = state;
   session.nonce = nonce;
   session.codeVerifier = codeVerifier;
+  session.dpop = {privateKeyPem, publicJwk}
 
   // params for tallyme
   // TODO(oidc-hardening): Validate config.rp.redirectUris[0] exists and matches registered redirect_uri at the authorization server.

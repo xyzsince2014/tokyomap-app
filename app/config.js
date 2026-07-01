@@ -16,6 +16,7 @@ const as = {
   revokeEndpoint: `${process.env.IDP_DOMAIN}/api/v1/revoke`,
   // RFC 7523 §2.2: fixed identifier declaring client_assertion is a JWT Bearer assertion
   clientAssertionType: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+  clientAssertionLifetimeSec: 60,
 };
 
 const rs = {
