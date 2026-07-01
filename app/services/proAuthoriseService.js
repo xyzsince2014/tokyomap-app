@@ -25,6 +25,11 @@ const execute = async (query, session) => {
 		throw new Error('Invalid state');
 	}
 
+  // RFC9207 verify the issuer to prevent mix-up attacks
+  if (query.iss !== config.as.host) {
+    throw new Error('Invalid issuer');
+  }
+
   // make sure code exists in the query params
   if (!query.code) {
     throw new Error('No auth code provided');
