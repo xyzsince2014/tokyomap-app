@@ -14,6 +14,7 @@ const as = {
   tokenEndpoint: `${process.env.IDP_DOMAIN}/api/v1/token`,
   publicKeysEndpoint: `${process.env.IDP_DOMAIN}/api/v1/public-keys`,
   revokeEndpoint: `${process.env.IDP_DOMAIN}/api/v1/revoke`,
+  parEndpoint: `${process.env.IDP_DOMAIN}/api/v1/par`,
   // RFC 7523 §2.2: fixed identifier declaring client_assertion is a JWT Bearer assertion
   clientAssertionType: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
   clientAssertionLifetimeSec: 60,
