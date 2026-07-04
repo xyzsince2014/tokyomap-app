@@ -3,6 +3,7 @@ const fetch = require("node-fetch");
 const oidcService = require('../services/oidcService');
 const config = require('../config');
 const util = require('../utils');
+const mtlsAgent = require('./mtlsAgent');
 
 /**
  * Requests to the RS for the userInfo.
@@ -13,16 +14,20 @@ const util = require('../utils');
  */
 const getUserInfo = async (accessToken, dpop) => {
 
-  const dpopProof = oidcService.buildDpopProof({...dpop, htm: 'GET', htu: config.rs.userInfoEndpoint, accessToken});
+  const headers = {'Accept': 'application/json'};
+
+  // cf. DPoP
+  // headers.Authorization = `DPoP ${accessToken}`;
+  // headers.DPoP = oidcService.buildDpopProof({ ...dpop, htm: 'GET', htu: config.rs.userInfoEndpoint, accessToken });
+
+  const options = {method: 'GET', headers};
+
+  // mTLS
+  headers.Authorization = `Bearer ${accessToken}`;
+  options.agent = mtlsAgent.getMtlsAgent();
 
   try {
-    const response = await fetch(
-      config.rs.userInfoEndpoint,
-      {
-        method: 'GET',
-        headers: {'Authorization': `DPoP ${accessToken}`, 'DPoP': dpopProof, 'Accept': 'application/json'}
-      }
-    );
+    const response = await fetch(config.rs.userInfoEndpoint, options);
 
     if (!response.ok) {
       return null;

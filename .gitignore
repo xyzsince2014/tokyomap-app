@@ -1,6 +1,7 @@
 **/node_modules/
 **/*.log
 **/.DS_Store
+
 postgres/hgsql/
 postgres/var/
 
@@ -8,3 +9,7 @@ redis/data/
 
 app/dev.env
 app/secrets/
+
+app/**/*.csr
+app/**/*.crt
+app/**/*.key
