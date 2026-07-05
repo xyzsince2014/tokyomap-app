@@ -2,6 +2,7 @@ const fetch = require("node-fetch");
 
 const oidcService = require('../services/oidcService');
 const config = require('../config');
+const mtlsAgent = require('./mtlsAgent');
 
 /**
  * Pushes the authorisation request params to the AS /par endpoint (RFC 9126), authenticating
@@ -49,7 +50,6 @@ const pushAuthorisationRequest = async (state, nonce, codeChallenge) => {
  * @returns
  */
 const fetchTokens = async (code, codeVerifier, dpop) => {
-  const dpopProof = oidcService.buildDpopProof({...dpop, htm: 'POST', htu: config.as.tokenEndpoint});
 
   const body = new URLSearchParams({
     grant_type: config.rp.grantTypes[0],
@@ -60,11 +60,16 @@ const fetchTokens = async (code, codeVerifier, dpop) => {
     client_assertion: oidcService.buildClientAssertion(),
   }).toString();
 
-  const response = await fetch(config.as.tokenEndpoint, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'DPoP': dpopProof},
-    body,
-  });
+  const headers = {'Content-Type': 'application/x-www-form-urlencoded'};
+
+  // DPoP
+  // headers.DPoP = oidcService.buildDpopProof({...dpop, htm: 'POST', htu: config.as.tokenEndpoint});
+
+  // mTLS
+  const options = {method: 'POST', headers, body};
+  options.agent = mtlsAgent.getMtlsAgent();
+
+  const response = await fetch(config.as.tokenEndpoint, options);
 
   if (!response.ok) {
     throw new Error(`Token exchange failed: ${response.status}`);

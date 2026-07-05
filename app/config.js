@@ -34,7 +34,10 @@ const rp = {
   tokenEndpointAuthMethod: 'private_key_jwt', // how the RP authenticates to the token endpoint (signed JWT, RFC 7523)
   scope: ['openid', 'profile', 'email'],
   alg: 'RS256',
-  leeway: 60 // sec
+  leeway: 60, // sec
+  clientCertPath: process.env.RP_CLIENT_CERT_PATH, // e.g. ./certs/tokyomap.crt
+  clientKeyPath:  process.env.RP_CLIENT_KEY_PATH,  // e.g. ./certs/tokyomap.key
+  tlsRejectUnauthorized: process.env.RP_TLS_REJECT_UNAUTHORIZED !== 'false', // TLS: verify the CA certificate, false only for dev
 };
 
 const client = {
