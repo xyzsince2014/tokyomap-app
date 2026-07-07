@@ -207,10 +207,58 @@ const verifyIdToken = async ({
   return payload;
 };
 
+/**
+ * Verfies a JARM AuthZ response JWT.
+ *
+ * @param {*} responseJwt
+ * @param {*} expectedIss
+ * @param {*} expectedAud
+ * @param {*} getPublicKeyFn
+ * @param {*} expectedAlg
+ * @param {*} leeway
+ * @returns the JARM's payload
+ */
+const verifyJarm = async ({responseJwt, expectedIss, expectedAud, getPublicKeyFn, expectedAlg = 'RS256', leeway = 60}) => {
+  const parts = responseJwt.split('.');
+
+  if (parts.length !== 3) {
+    throw new Error("Invalid JARM JWT structure");
+  }
+
+  const header = JSON.parse(base64url.decode(parts[0]));
+  if (header.alg !== expectedAlg) {
+    throw new Error("Invalid alg");
+  }
+
+  const publicKey = await getPublicKeyFn(header.kid);
+  if (!jose.jws.JWS.verify(responseJwt, publicKey, [header.alg])) {
+    throw new Error("Invalid JARM signature");
+  }
+
+  const payload = JSON.parse(base64url.decode(parts[1]));
+  if (payload.iss !== expectedIss) {
+    throw new Error("Invalid issuer");
+  }
+
+  // RFC 9207
+  const audArr = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+  if (!audArr.includes(expectedAud)) {
+    throw new Error("Invalid audience");
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  if (payload.exp < (now - leeway)) {
+    throw new Error("JARM response expired");
+  }
+
+  return payload;
+};
+
 module.exports = {
   generateAuthParams,
   buildClientAssertion,
   generateDpopKeyPair,
   buildDpopProof,
-  verifyIdToken
+  verifyIdToken,
+  verifyJarm,
 };

@@ -26,6 +26,7 @@ const pushAuthorisationRequest = async (state, nonce, codeChallenge) => {
     code_challenge_method: 'S256',
     client_assertion_type: config.as.clientAssertionType,
     client_assertion: oidcService.buildClientAssertion(),
+    response_mode: 'jwt',
   }).toString();
 
   const response = await fetch(config.as.parEndpoint, {
