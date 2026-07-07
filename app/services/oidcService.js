@@ -46,15 +46,12 @@ const generateAuthParams = () => {
  * @returns {string} signed client_assertion JWT
  */
 const buildClientAssertion = () => {
-  // read privateKeyPEM and parse it into a key object jsrsasign can sign with
-  const privateKeyPem = fs.readFileSync(config.client.privateKeyPath, 'utf8');
-  const privateKey = KEYUTIL.getKey(privateKeyPem); // KEYUTIL converts PEM string to key object
-
-  // current time in epoch seconds, used for iat and exp
-  const now = KJUR.jws.IntDate.get('now'); // KJUR is util for signature generation, etc.
 
   // JWS header: RS256 (SHA-256 with RSA private key)
   const header = {alg: 'RS256', typ: 'JWT'};
+
+  // current time in epoch seconds, used for iat and exp
+  const now = KJUR.jws.IntDate.get('now'); // KJUR is util for signature generation, etc.
 
   const payload = {
     iss: config.client.clientId, // issuer: the client authenticating itself
@@ -65,10 +62,50 @@ const buildClientAssertion = () => {
     exp: now + config.as.clientAssertionLifetimeSec, // short expiry to limit the replay window
   };
 
+  const privateKey = readPrivateKeyPEM();
+
   // a signed JWT consisting of sign header + payload with the private key
   const clientAssertion = KJUR.jws.JWS.sign('RS256', JSON.stringify(header), JSON.stringify(payload), privateKey);
 
   return clientAssertion;
+};
+
+/**
+ * @param {*} param0 
+ * @returns {string} a signed JWT consisting of sign header + payload with the private key
+ */
+const buildRequestObject = ({state, nonce, codeChallenge}) => {
+
+  // RFC 9101
+  const header = {alg: 'RS256', typ: 'oauth-authz-req+jwt'};
+
+  const payload = {
+    iss: config.client.clientId,
+    aud: config.as.host,
+    response_type: config.rp.responseTypes[0],
+    client_id: config.client.clientId,
+    redirect_uri: config.rp.redirectUris[0],
+    scope: config.client.scope.join(' '),
+    state,
+    nonce,
+    code_challenge: codeChallenge,
+    code_challenge_method: 'S256',
+    response_mode: 'jwt'
+  };
+
+  const privateKey = readPrivateKeyPEM();
+
+  return KJUR.jws.JWS.sign('RS256', JSON.stringify(header), JSON.stringify(payload), privateKey);
+};
+
+/**
+ * Reads privateKeyPEM, and parses it into a key object jsrsasign can sign with.
+ *
+ * @returns the private key
+ */
+const readPrivateKeyPEM = () => {
+  const privateKeyPem = fs.readFileSync(config.client.privateKeyPath, 'utf8');
+  return KEYUTIL.getKey(privateKeyPem); // KEYUTIL converts PEM string to key object
 };
 
 /**
@@ -257,6 +294,7 @@ const verifyJarm = async ({responseJwt, expectedIss, expectedAud, getPublicKeyFn
 module.exports = {
   generateAuthParams,
   buildClientAssertion,
+  buildRequestObject,
   generateDpopKeyPair,
   buildDpopProof,
   verifyIdToken,

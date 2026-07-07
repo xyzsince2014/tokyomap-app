@@ -15,19 +15,28 @@ const mtlsAgent = require('./mtlsAgent');
  */
 const pushAuthorisationRequest = async (state, nonce, codeChallenge) => {
 
+  // JAR
   const body = new URLSearchParams({
-    response_type: config.rp.responseTypes[0],
     client_id: config.client.clientId,
-    redirect_uri: config.rp.redirectUris[0],
-    scope: config.client.scope.join(' '),
-    state,
-    nonce,
-    code_challenge: codeChallenge,
-    code_challenge_method: 'S256',
+    request: oidcService.buildRequestObject({state, nonce, codeChallenge}),
     client_assertion_type: config.as.clientAssertionType,
     client_assertion: oidcService.buildClientAssertion(),
-    response_mode: 'jwt',
   }).toString();
+
+  // non-JAR
+  // const body = new URLSearchParams({
+  //   response_type: config.rp.responseTypes[0],
+  //   client_id: config.client.clientId,
+  //   redirect_uri: config.rp.redirectUris[0],
+  //   scope: config.client.scope.join(' '),
+  //   state,
+  //   nonce,
+  //   code_challenge: codeChallenge,
+  //   code_challenge_method: 'S256',
+  //   response_mode: 'jwt',
+  //   client_assertion_type: config.as.clientAssertionType,
+  //   client_assertion: oidcService.buildClientAssertion(),
+  // }).toString();
 
   const response = await fetch(config.as.parEndpoint, {
     method: 'POST',
