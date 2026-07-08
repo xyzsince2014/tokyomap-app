@@ -19,22 +19,30 @@ const execute = async (query, session) => {
     throw new Error(`AS Error: ${query.error} - ${query.error_description || ''}`);
   }
 
-  // check state to prevent code injection
-  if (!session.state || query.state !== session.state) {
-    console.log(`State mismatch: query.state = ${query.state}, session.state = ${session.state}`);
-		throw new Error('Invalid state');
-	}
+  let code = null;
 
-  // RFC9207 verify the issuer to prevent mix-up attacks
-  if (query.iss !== config.as.host) {
-    throw new Error('Invalid issuer');
+  if (query.response) {
+    // JARM
+    const jarm = await oidcService.verifyJarm({
+      responseJwt: query.response,
+      expectedIss: config.as.host,
+      expectedAud: config.client.clientId,
+      getPublicKeyFn,
+      expectedAlg: config.rp.alg
+    });
+    verifyStateAndCode({session, state: jarm.state, code: jarm.code});
+    code = jarm.code;
+
+  } else {
+    // RFC 9207 verify the issuer to prevent mix-up attacks
+    if (query.iss !== config.as.host) {
+      throw new Error('Invalid issuer');
+    }
+    verifyStateAndCode({session, state: query.state, code: query.code});
+    code = query.code;
   }
 
-  // make sure code exists in the query params
-  if (!query.code) {
-    throw new Error('No auth code provided');
-  }
-  const response = await asClient.fetchTokens(query.code, session.codeVerifier, session.dpop);
+  const response = await asClient.fetchTokens(code, session.codeVerifier, session.dpop);
 
   session.accessToken = response.accessToken;
   session.refreshToken = response.refreshToken;
@@ -75,6 +83,25 @@ const execute = async (query, session) => {
 const getPublicKeyFn = async (kid) => {
   const res = await asClient.getPublicKey(kid);
   return res.pemPublicKey;
+};
+
+/**
+ * Verifies the given state and code.
+ *
+ * @param {*} session
+ * @param {*} state
+ * @param {*} code
+ */
+const verifyStateAndCode = ({session, state, code}) => {
+  // check state to prevent code injection
+  if (!session.state || state !== session.state) {
+    throw new Error('Invalid state');
+  }
+
+  // make sure code exists
+  if (!code) {
+    throw new Error('No auth code provided');
+  }
 };
 
 module.exports = {
