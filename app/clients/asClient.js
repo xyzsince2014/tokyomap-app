@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const statusCodes = require("http-status-codes");
 
 const oidcService = require('../services/oidcService');
 const config = require('../config');
@@ -15,7 +16,7 @@ const mtlsAgent = require('./mtlsAgent');
  */
 const pushAuthorisationRequest = async (state, nonce, codeChallenge) => {
 
-  // JAR
+  /* JAR */
   const body = new URLSearchParams({
     client_id: config.client.clientId,
     request: oidcService.buildRequestObject({state, nonce, codeChallenge}),
@@ -23,7 +24,7 @@ const pushAuthorisationRequest = async (state, nonce, codeChallenge) => {
     client_assertion: oidcService.buildClientAssertion(),
   }).toString();
 
-  // non-JAR
+  /* non-JAR */
   // const body = new URLSearchParams({
   //   response_type: config.rp.responseTypes[0],
   //   client_id: config.client.clientId,
@@ -70,29 +71,73 @@ const fetchTokens = async (code, codeVerifier, dpop) => {
     client_assertion: oidcService.buildClientAssertion(),
   }).toString();
 
-  const headers = {'Content-Type': 'application/x-www-form-urlencoded'};
+  /* DPoP */
+  // return await fetchTokensDpop({dpop, body});
 
-  // DPoP
-  // headers.DPoP = oidcService.buildDpopProof({...dpop, htm: 'POST', htu: config.as.tokenEndpoint});
+  /* mTLS */
+  return await fetchTokensMtls({body});
+};
 
-  // mTLS
-  const options = {method: 'POST', headers, body};
-  options.agent = mtlsAgent.getMtlsAgent();
+/**
+ * Fetches tokens with DPoP.
+ *
+ * @param {*} param.headers
+ * @param {*} param.body
+ * @returns tokens
+ */
+const fetchTokensDpop = async ({dpop, body}) => {
+  // first attempt: proof without a nonce (fresh jti)
+  let response = await send({dpop, body});
 
-  const response = await fetch(config.as.tokenEndpoint, options);
+  // RFC 9449 §8: DPoP-Nonce challenge — retry once with a proof carrying the server-issued nonce
+  const nonce = response.headers.get('DPoP-Nonce');
+  if (response.status === statusCodes.BAD_REQUEST && nonce) {
+    response = await send({dpop, body, nonce});
+  }
 
   if (!response.ok) {
     throw new Error(`Token exchange failed: ${response.status}`);
   }
 
-  return response.json();
+  return await response.json();
+};
+
+const send = ({dpop, body, nonce = null}) => fetch(config.as.tokenEndpoint, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'DPoP': oidcService.buildDpopProof({...dpop, htm: 'POST', htu: config.as.tokenEndpoint, nonce})
+  },
+  body,
+});
+
+/**
+ * Fetches tokens with mTLS.
+ *
+ * @param {*} param.headers
+ * @param {*} param.body
+ * @returns tokens
+ */
+const fetchTokensMtls = async ({body}) => {
+  const response = await fetch(config.as.tokenEndpoint, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    agent: mtlsAgent.getMtlsAgent(),
+    body
+  });
+
+  if (!response.ok) {
+    throw new Error(`Token exchange failed: ${response.status}`);
+  }
+
+  return await response.json();
 };
 
 /**
- * Gets the public key.
+ * Fetches the public key.
  *
  * @param {*} kid
- * @returns
+ * @returns the public key
  */
 const getPublicKey = async (kid) => {
   const response = await fetch(`${config.as.publicKeysEndpoint}?kid=${kid}`);
@@ -101,7 +146,7 @@ const getPublicKey = async (kid) => {
     throw new Error(`Failed to fetch JWKS: ${response.status}`);
   }
 
-  return response.json();
+  return await response.json();
 };
 
 /**
