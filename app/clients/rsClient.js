@@ -1,4 +1,5 @@
 const fetch = require("node-fetch");
+const statusCodes = require("http-status-codes");
 
 const oidcService = require('../services/oidcService');
 const config = require('../config');
@@ -13,33 +14,72 @@ const mtlsAgent = require('./mtlsAgent');
  * @returns userInfo
  */
 const getUserInfo = async (accessToken, dpop) => {
-
-  const headers = {'Accept': 'application/json'};
-
-  // cf. DPoP
-  // headers.Authorization = `DPoP ${accessToken}`;
-  // headers.DPoP = oidcService.buildDpopProof({ ...dpop, htm: 'GET', htu: config.rs.userInfoEndpoint, accessToken });
-
-  const options = {method: 'GET', headers};
-
-  // mTLS
-  headers.Authorization = `Bearer ${accessToken}`;
-  options.agent = mtlsAgent.getMtlsAgent();
-
   try {
-    const response = await fetch(config.rs.userInfoEndpoint, options);
+    /* DPoP */
+    // return await fetchUserInfoDpop({accessToken, dpop});
 
-    if (!response.ok) {
-      return null;
-    }
-
-    const userInfo = await response.json();
-    return userInfo;
+    /* mTLS */
+    return await fetchUserInfoMtls(accessToken);
 
   } catch (e) {
     console.log(e);
     return null;
   }
+};
+
+/**
+ * Fetches user info with DPoP.
+ *
+ * @param {*} param.accessToken
+ * @param {*} param.dpop
+ * @returns the user info
+ */
+const fetchUserInfoDpop = async ({accessToken, dpop}) => {
+  let response = await send({accessToken, dpop});
+
+  // RFC 9449 §9: DPoP-Nonce challenge
+  const nonce = response.headers.get('DPoP-Nonce');
+  if (response.status === statusCodes.UNAUTHORIZED && nonce) {
+    response = await send({dpop, accessToken, nonce});
+  }
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return await response.json();
+};
+
+const send = ({accessToken, dpop, nonce = null}) => fetch(config.rs.userInfoEndpoint, {
+  method: 'GET',
+  headers: {
+    'Accept': 'application/json',
+    'Authorization': `DPoP ${accessToken}`,
+    'DPoP': oidcService.buildDpopProof({...dpop, htm: 'GET', htu: config.rs.userInfoEndpoint, accessToken, nonce}),
+  },
+});
+
+/**
+ * Fetches user info with mTLS.
+ *
+ * @param {*} accessToken 
+ * @returns the user info
+ */
+const fetchUserInfoMtls = async (accessToken) => {
+    const response = await fetch(config.rs.userInfoEndpoint, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      agent: mtlsAgent.getMtlsAgent()
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
 };
 
 /**
@@ -50,7 +90,7 @@ const getUserInfo = async (accessToken, dpop) => {
  */
 const fetchProfiles = async (subs) => {
   try {
-    const accessToken = await getClientAccessToken();
+    const accessToken = await fetchClientAccessToken();
 
     const response = await fetch(
       config.rs.profilesEndpoint,
@@ -82,7 +122,7 @@ const fetchProfiles = async (subs) => {
 /**
  * Fetches an access token with Client Credentials Grant.
  */
-const getClientAccessToken = async () => {
+const fetchClientAccessToken = async () => {
   // todo: use token cached in redis
   // if (cachedToken && Date.now() < tokenExpiresAt) {
   //   return cachedToken;

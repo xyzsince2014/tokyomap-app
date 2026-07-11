@@ -136,9 +136,10 @@ const generateDpopKeyPair = () => {
  * @param {string} params.htm HTTP method of the target request, bound as the `htm` claim: e.g. 'POST', 'GET'
  * @param {string} params.htu target HTTP URI without query/fragment (e.g. the token or userinfo endpoint), bound as the `htu` claim
  * @param {string|null} [params.accessToken=null] its base64url(SHA-256) hash is added as the `ath` claim to bind the proof to that access token
+ * @param {string|null} params.nonce DPoP Nonce
  * @returns {string} the signed DPoP proof JWT
  */
-const buildDpopProof = ({privateKeyPem, publicJwk, htm, htu, accessToken = null}) => {
+const buildDpopProof = ({privateKeyPem, publicJwk, htm, htu, accessToken = null, nonce = null}) => {
 
   // read privateKeyPEM and parse it into a key object jsrsasign can sign with
   const privateKey = KEYUTIL.getKey(privateKeyPem);
@@ -160,6 +161,11 @@ const buildDpopProof = ({privateKeyPem, publicJwk, htm, htu, accessToken = null}
     // Use irreversible SHA256
     // digest('base64url') ensures the hash is URL-safe for the auth request
     payload.ath = crypto.createHash('sha256').update(accessToken).digest('base64url');
+  }
+
+  if (nonce) {
+    // RFC 9449 §8-9
+    payload.nonce = nonce;
   }
 
   // sign the JWT with the private key
