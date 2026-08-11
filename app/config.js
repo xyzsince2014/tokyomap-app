@@ -26,6 +26,7 @@ const rs = {
 };
 
 const rp = {
+  scheme: 'mTLS', // mTLS or DPoP
   clientName: 'tokyomap-bff',
   clientUri: `${process.env.DOMAIN}`,
   redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],

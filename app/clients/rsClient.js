@@ -15,11 +15,8 @@ const mtlsAgent = require('./mtlsAgent');
  */
 const getUserInfo = async (accessToken, dpop) => {
   try {
-    /* DPoP */
-    // return await fetchUserInfoDpop({accessToken, dpop});
-
-    /* mTLS */
-    return await fetchUserInfoMtls(accessToken);
+    /* mTLS or DPoP */
+    return await (config.rp.scheme === 'mTLS' ? fetchUserInfoMtls(accessToken) : fetchUserInfoDpop({accessToken, dpop}));
 
   } catch (e) {
     console.log(e);
