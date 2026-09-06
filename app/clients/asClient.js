@@ -71,11 +71,8 @@ const fetchTokens = async (code, codeVerifier, dpop) => {
     client_assertion: oidcService.buildClientAssertion(),
   }).toString();
 
-  /* DPoP */
-  // return await fetchTokensDpop({dpop, body});
-
-  /* mTLS */
-  return await fetchTokensMtls({body});
+  /* mTLS or DPoP */
+  return await (config.rp.scheme === 'mTLS' ? fetchTokensMtls({body}) : fetchTokensDpop({dpop, body}));
 };
 
 /**

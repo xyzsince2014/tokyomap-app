@@ -21,11 +21,12 @@ const as = {
 };
 
 const rs = {
-  userInfoEndpoint: `${process.env.RESOURCE_DOMAIN}/userinfo`,
-  profilesEndpoint: `${process.env.RESOURCE_DOMAIN}/profiles`
+  userInfoEndpoint: `${process.env.RESOURCE_DOMAIN}/api/v1/userinfo`,
+  profilesEndpoint: `${process.env.RESOURCE_DOMAIN}/api/v1/profiles`
 };
 
 const rp = {
+  scheme: 'mTLS', // mTLS or DPoP
   clientName: 'tokyomap-bff',
   clientUri: `${process.env.DOMAIN}`,
   redirectUris: [`${process.env.DOMAIN}/api/auth/callback`],
